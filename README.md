@@ -14,7 +14,12 @@ Note: The behaviour of datalists and selects are slightly different.
 
 ## Running It
 
-Just use `elm reactor` then navigate to the two different implementations.
+Installl elm-live if you don't already have it:
+`npm install elm-live -g`
+
+Run the run script:
+`./run.sh`
+
 
 ## TODO
 
