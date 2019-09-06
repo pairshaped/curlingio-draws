@@ -106,7 +106,7 @@ viewDropDowns model =
 
 viewDropDown : List Option -> DropDown -> Html Msg
 viewDropDown options dropDown =
-    Keyed.node "select"
+    select
         [ style "padding" "5px"
         , style "margin" "5px"
         , name (String.fromInt dropDown.id)
