@@ -5109,8 +5109,6 @@ var author$project$Selects$viewOption = function (option) {
 var elm$html$Html$select = _VirtualDom_node('select');
 var elm$html$Html$Attributes$name = elm$html$Html$Attributes$stringProperty('name');
 var elm$html$Html$Attributes$selected = elm$html$Html$Attributes$boolProperty('selected');
-var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
 var elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -5153,8 +5151,6 @@ var author$project$Selects$viewDropDown = F2(
 			elm$html$Html$select,
 			_List_fromArray(
 				[
-					A2(elm$html$Html$Attributes$style, 'padding', '5px'),
-					A2(elm$html$Html$Attributes$style, 'margin', '5px'),
 					elm$html$Html$Attributes$name(
 					elm$core$String$fromInt(dropDown.id)),
 					elm$html$Html$Events$onInput(
@@ -5179,13 +5175,13 @@ var author$project$Selects$viewDropDown = F2(
 					options)));
 	});
 var elm$html$Html$div = _VirtualDom_node('div');
+var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
 var author$project$Selects$viewDropDowns = function (model) {
 	return A2(
 		elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2(elm$html$Html$Attributes$style, 'display', 'flex'),
-				A2(elm$html$Html$Attributes$style, 'flex-wrap', 'wrap')
+				elm$html$Html$Attributes$class('container')
 			]),
 		A2(
 			elm$core$List$map,
@@ -5538,8 +5534,6 @@ var author$project$DataList$viewDropDown = function (dropDown) {
 		elm$html$Html$input,
 		_List_fromArray(
 			[
-				A2(elm$html$Html$Attributes$style, 'padding', '5px'),
-				A2(elm$html$Html$Attributes$style, 'margin', '5px'),
 				elm$html$Html$Attributes$list('options'),
 				elm$html$Html$Attributes$name(
 				elm$core$String$fromInt(dropDown.id)),
@@ -5553,8 +5547,7 @@ var author$project$DataList$viewDropDowns = function (dropDowns) {
 		elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2(elm$html$Html$Attributes$style, 'display', 'flex'),
-				A2(elm$html$Html$Attributes$style, 'flex-wrap', 'wrap')
+				elm$html$Html$Attributes$class('container')
 			]),
 		A2(elm$core$List$map, author$project$DataList$viewDropDown, dropDowns));
 };

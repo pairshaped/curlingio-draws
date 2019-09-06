@@ -3,7 +3,7 @@ module DataList exposing (..)
 import Browser
 import Data exposing (..)
 import Html exposing (Html, datalist, div, input, p, text)
-import Html.Attributes exposing (disabled, id, list, name, style, value)
+import Html.Attributes exposing (class, disabled, id, list, name, value)
 import Html.Events exposing (onInput)
 
 
@@ -98,15 +98,13 @@ viewOption option =
 
 viewDropDowns : List DropDown -> Html Msg
 viewDropDowns dropDowns =
-    div [ style "display" "flex", style "flex-wrap" "wrap" ] (List.map viewDropDown dropDowns)
+    div [ class "container" ] (List.map viewDropDown dropDowns)
 
 
 viewDropDown : DropDown -> Html Msg
 viewDropDown dropDown =
     input
-        [ style "padding" "5px"
-        , style "margin" "5px"
-        , list "options"
+        [ list "options"
         , name (String.fromInt dropDown.id)
         , onInput (SelectedItem dropDown)
         ]

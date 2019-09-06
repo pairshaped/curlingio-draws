@@ -3,7 +3,7 @@ module Selects exposing (..)
 import Browser
 import Data exposing (..)
 import Html exposing (Html, div, option, p, select, text)
-import Html.Attributes exposing (disabled, name, selected, style, value)
+import Html.Attributes exposing (class, disabled, name, selected, value)
 import Html.Events exposing (onInput)
 import Html.Keyed as Keyed
 import Html.Lazy exposing (lazy)
@@ -100,16 +100,14 @@ viewOption option =
 
 viewDropDowns : Model -> Html Msg
 viewDropDowns model =
-    div [ style "display" "flex", style "flex-wrap" "wrap" ]
+    div [ class "container" ]
         (List.map (viewDropDown model.options) model.dropDowns)
 
 
 viewDropDown : List Option -> DropDown -> Html Msg
 viewDropDown options dropDown =
     select
-        [ style "padding" "5px"
-        , style "margin" "5px"
-        , name (String.fromInt dropDown.id)
+        [ name (String.fromInt dropDown.id)
         , onInput (SelectedItem dropDown)
         ]
         (Html.option [ disabled True, selected True ] [ text "-- make a selection --" ]
