@@ -3,7 +3,7 @@ module DataList exposing (..)
 import Browser
 import Data exposing (..)
 import Html exposing (Html, datalist, div, input, p, text)
-import Html.Attributes exposing (disabled, id, list, style)
+import Html.Attributes exposing (disabled, id, list, name, style, value)
 import Html.Events exposing (onInput)
 
 
@@ -103,6 +103,11 @@ viewDropDowns dropDowns =
 
 viewDropDown : DropDown -> Html Msg
 viewDropDown dropDown =
-    div [ style "padding" "5px", onInput (SelectedItem dropDown) ]
-        [ input [ style "padding" "5px", list "options" ] []
+    input
+        [ style "padding" "5px"
+        , style "margin" "5px"
+        , list "options"
+        , name (String.fromInt dropDown.id)
+        , onInput (SelectedItem dropDown)
         ]
+        []
