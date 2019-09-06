@@ -5,6 +5,8 @@ import Data exposing (..)
 import Html exposing (Html, datalist, div, input, p, text)
 import Html.Attributes exposing (class, disabled, id, list, name, value)
 import Html.Events exposing (onInput)
+import Html.Keyed as Keyed
+import Html.Lazy exposing (lazy)
 
 
 main =
@@ -98,7 +100,14 @@ viewOption option =
 
 viewDropDowns : List DropDown -> Html Msg
 viewDropDowns dropDowns =
-    div [ class "container" ] (List.map viewDropDown dropDowns)
+    Keyed.node "div"
+        [ class "container" ]
+        (List.map viewKeyedDropDown dropDowns)
+
+
+viewKeyedDropDown : DropDown -> ( String, Html Msg )
+viewKeyedDropDown dropDown =
+    ( String.fromInt dropDown.id, lazy viewDropDown dropDown )
 
 
 viewDropDown : DropDown -> Html Msg

@@ -6,7 +6,7 @@ import Html exposing (Html, div, option, p, select, text)
 import Html.Attributes exposing (class, disabled, name, selected, value)
 import Html.Events exposing (onInput)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy)
+import Html.Lazy exposing (lazy, lazy2)
 
 
 main =
@@ -43,6 +43,12 @@ disableSelectedOptions model =
                 |> List.map updateOption
     in
     { model | options = updatedOptions }
+
+
+optionsWithBlank : List Option -> List Option
+optionsWithBlank options =
+    Option 0 "-- make a selection --" True
+        :: options
 
 
 type Msg
@@ -93,23 +99,32 @@ view model =
         ]
 
 
-viewOption : Option -> Html Msg
-viewOption option =
-    Html.option [ value (String.fromInt option.id), disabled option.disabled ] [ text option.name ]
-
-
 viewDropDowns : Model -> Html Msg
 viewDropDowns model =
-    div [ class "container" ]
-        (List.map (viewDropDown model.options) model.dropDowns)
+    Keyed.node "div"
+        [ class "container" ]
+        (List.map (viewKeyedDropDown (optionsWithBlank model.options)) model.dropDowns)
+
+
+viewKeyedDropDown : List Option -> DropDown -> ( String, Html Msg )
+viewKeyedDropDown options dropdown =
+    ( String.fromInt dropdown.id, lazy2 viewDropDown options dropdown )
 
 
 viewDropDown : List Option -> DropDown -> Html Msg
 viewDropDown options dropDown =
-    select
+    Keyed.node "select"
         [ name (String.fromInt dropDown.id)
         , onInput (SelectedItem dropDown)
         ]
-        (Html.option [ disabled True, selected True ] [ text "-- make a selection --" ]
-            :: List.map (lazy viewOption) options
-        )
+        (List.map viewKeyedOption options)
+
+
+viewKeyedOption : Option -> ( String, Html Msg )
+viewKeyedOption option =
+    ( String.fromInt option.id, lazy viewOption option )
+
+
+viewOption : Option -> Html Msg
+viewOption option =
+    Html.option [ value (String.fromInt option.id), disabled option.disabled ] [ text option.name ]
