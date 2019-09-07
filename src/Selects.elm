@@ -1,7 +1,6 @@
 module Selects exposing (..)
 
 import Browser
-import Data exposing (..)
 import Html exposing (Html, div, option, p, select, text)
 import Html.Attributes exposing (class, disabled, name, selected, value)
 import Html.Events exposing (onInput)
@@ -11,6 +10,49 @@ import Html.Lazy exposing (lazy, lazy2)
 
 main =
     Browser.sandbox { init = init, update = update, view = view }
+
+
+
+-- MODELS
+
+
+type alias DropDown =
+    { id : Int
+    , selectedOption : Maybe Option
+    }
+
+
+type alias Option =
+    { id : Int
+    , name : String
+    , disabled : Bool
+    }
+
+
+type alias Model =
+    { dropDowns : List DropDown
+    , options : List Option
+    }
+
+
+type Msg
+    = SelectedItem DropDown String
+
+
+init =
+    { dropDowns =
+        List.repeat 256 0
+            |> List.indexedMap (\n _ -> DropDown (n + 1) Nothing)
+    , options =
+        Option 0 "-- make a selection --" False
+            :: (List.repeat 256 0
+                    |> List.indexedMap (\n _ -> Option (n + 1) ("Label for " ++ String.fromInt (n + 1)) False)
+               )
+    }
+
+
+
+-- HELPERS
 
 
 getOptionFromId : Model -> Int -> Maybe Option
@@ -45,14 +87,8 @@ disableSelectedOptions model =
     { model | options = updatedOptions }
 
 
-optionsWithBlank : List Option -> List Option
-optionsWithBlank options =
-    Option 0 "-- make a selection --" True
-        :: options
 
-
-type Msg
-    = SelectedItem DropDown String
+-- UPDATE
 
 
 update : Msg -> Model -> Model
@@ -91,6 +127,10 @@ update msg model =
                 |> disableSelectedOptions
 
 
+
+-- VIEW
+
+
 view : Model -> Html Msg
 view model =
     div []
@@ -103,7 +143,7 @@ viewDropDowns : Model -> Html Msg
 viewDropDowns model =
     Keyed.node "div"
         [ class "container" ]
-        (List.map (viewKeyedDropDown (optionsWithBlank model.options)) model.dropDowns)
+        (List.map (viewKeyedDropDown model.options) model.dropDowns)
 
 
 viewKeyedDropDown : List Option -> DropDown -> ( String, Html Msg )

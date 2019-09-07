@@ -1,7 +1,6 @@
 module DataList exposing (..)
 
 import Browser
-import Data exposing (..)
 import Html exposing (Html, datalist, div, input, p, text)
 import Html.Attributes exposing (class, disabled, id, list, name, value)
 import Html.Events exposing (onInput)
@@ -13,18 +12,51 @@ main =
     Browser.sandbox { init = init, update = update, view = view }
 
 
-getOptionFromName : Model -> String -> Maybe Option
-getOptionFromName model name =
-    List.filter (\o -> o.name == name) model.options
-        |> List.head
+
+-- MODELS
 
 
+type alias DropDown =
+    { id : Int
+    , selectedOption : Maybe Option
+    }
 
--- When an option is selected, disable the option that was selected.
+
+type alias Option =
+    { id : Int
+    , name : String
+    , disabled : Bool
+    }
+
+
+type alias Model =
+    { dropDowns : List DropDown
+    , options : List Option
+    }
 
 
 type Msg
     = SelectedItem DropDown String
+
+
+init =
+    { dropDowns =
+        List.repeat 256 0
+            |> List.indexedMap (\n _ -> DropDown (n + 1) Nothing)
+    , options =
+        List.repeat 256 0
+            |> List.indexedMap (\n _ -> Option (n + 1) ("Label for " ++ String.fromInt (n + 1)) False)
+    }
+
+
+
+-- HELPERS
+
+
+getOptionFromName : Model -> String -> Maybe Option
+getOptionFromName model name =
+    List.filter (\o -> o.name == name) model.options
+        |> List.head
 
 
 disableSelectedOptions : Model -> Model
@@ -51,6 +83,10 @@ disableSelectedOptions model =
                 |> List.map updateOption
     in
     { model | options = updatedOptions }
+
+
+
+-- UPDATE
 
 
 update : Msg -> Model -> Model
@@ -82,6 +118,10 @@ update msg model =
             in
             { model | dropDowns = updatedDropDowns }
                 |> disableSelectedOptions
+
+
+
+-- VIEW
 
 
 view : Model -> Html Msg
