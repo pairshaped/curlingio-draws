@@ -16,7 +16,7 @@ main =
 -- MODELS
 
 
-type alias DropDown =
+type alias Dropdown =
     { id : Int
     , value : String
     }
@@ -30,15 +30,15 @@ type alias Option =
 
 
 type alias Model =
-    { dropDowns : List DropDown
+    { dropdowns : List Dropdown
     , options : List Option
     }
 
 
 init =
-    { dropDowns =
+    { dropdowns =
         List.repeat 256 0
-            |> List.indexedMap (\n _ -> DropDown (n + 1) "")
+            |> List.indexedMap (\n _ -> Dropdown (n + 1) "")
     , options =
         List.repeat 256 0
             |> List.indexedMap (\n _ -> Option (n + 1) ("Label for " ++ String.fromInt (n + 1)) False)
@@ -60,17 +60,17 @@ getOptionByName options name =
 
 
 type Msg
-    = SelectedItem DropDown String
+    = SelectedItem Dropdown String
     | ClearInvalidSelections
 
 
 updateOptions : Model -> Model
 updateOptions model =
     let
-        -- Loop through the options setting each to disabled if a matching dropDown value is the same as it's name
+        -- Loop through the options setting each to disabled if a matching dropdown value is the same as it's name
         optionIsSelected : Option -> Bool
         optionIsSelected option =
-            List.any (\d -> d.value == option.name) model.dropDowns
+            List.any (\d -> d.value == option.name) model.dropdowns
 
         updateOption : Option -> Option
         updateOption option =
@@ -84,22 +84,32 @@ update msg model =
     case msg of
         SelectedItem onDropDown value ->
             let
-                updateDropDown dropDown =
-                    if dropDown.id == onDropDown.id then
-                        { dropDown | value = value }
+                updateDropDown dropdown =
+                    if dropdown.id == onDropDown.id then
+                        { dropdown | value = value }
 
                     else
-                        dropDown
+                        dropdown
 
                 updateDropDowns =
-                    List.map updateDropDown model.dropDowns
+                    List.map updateDropDown model.dropdowns
             in
-            { model | dropDowns = updateDropDowns }
+            { model | dropdowns = updateDropDowns }
                 |> updateOptions
 
         ClearInvalidSelections ->
-            -- TODO
-            model
+            let
+                validDropdown dropdown =
+                    if List.any (\o -> o.name == dropdown.value) model.options then
+                        dropdown
+
+                    else
+                        { dropdown | value = "" }
+
+                validDropdowns =
+                    List.map validDropdown model.dropdowns
+            in
+            { model | dropdowns = validDropdowns }
 
 
 
@@ -112,7 +122,7 @@ view model =
         [ p [] [ text "Used the datalist element to repeat a list of dropdowns that share the same options. When an option is selected in any of the dropdowns it will be disabled in the datalist and can't be selected again." ]
         , datalist [ id "options" ] (List.map viewOption model.options)
         , button [ onClick ClearInvalidSelections ] [ text "Clear invalid selections" ]
-        , viewDropDowns model.dropDowns
+        , viewDropDowns model.dropdowns
         ]
 
 
@@ -121,23 +131,24 @@ viewOption option =
     Html.option [ disabled option.disabled ] [ text option.name ]
 
 
-viewDropDowns : List DropDown -> Html Msg
-viewDropDowns dropDowns =
+viewDropDowns : List Dropdown -> Html Msg
+viewDropDowns dropdowns =
     Keyed.node "div"
         [ class "container" ]
-        (List.map viewKeyedDropDown dropDowns)
+        (List.map viewKeyedDropDown dropdowns)
 
 
-viewKeyedDropDown : DropDown -> ( String, Html Msg )
-viewKeyedDropDown dropDown =
-    ( String.fromInt dropDown.id, lazy viewDropDown dropDown )
+viewKeyedDropDown : Dropdown -> ( String, Html Msg )
+viewKeyedDropDown dropdown =
+    ( String.fromInt dropdown.id, lazy viewDropDown dropdown )
 
 
-viewDropDown : DropDown -> Html Msg
-viewDropDown dropDown =
+viewDropDown : Dropdown -> Html Msg
+viewDropDown dropdown =
     input
         [ list "options"
-        , name (String.fromInt dropDown.id)
-        , onInput (SelectedItem dropDown)
+        , name (String.fromInt dropdown.id)
+        , onInput (SelectedItem dropdown)
+        , value dropdown.value
         ]
         []
