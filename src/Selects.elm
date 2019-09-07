@@ -41,11 +41,11 @@ type Msg
 
 init =
     { dropDowns =
-        List.repeat 256 0
+        List.repeat 512 0
             |> List.indexedMap (\n _ -> DropDown (n + 1) Nothing)
     , options =
         Option 0 "-- make a selection --" False
-            :: (List.repeat 256 0
+            :: (List.repeat 512 0
                     |> List.indexedMap (\n _ -> Option (n + 1) ("Label for " ++ String.fromInt (n + 1)) False)
                )
     }
