@@ -1,16 +1,15 @@
 # Description
 
-This is a playground to compare the performance of:
+This is the draw sheet editor for Curling I/O.
 
-1. Many inputs sharing the same datalist options.
-2. Many selects with embedded (repeated) options.
+## Requirements:
 
-For both scenarios, the user must not be able to select an option that was already selected in one of the other inputs.
-
-Note: The behaviour of datalists and selects are slightly different.
-* With datalists you can search, but also they don't really clear out quite as well (you can to replace the text).
-* With datalists we need to guard against random text being input.
-* Datalists will show the value when selected instead of the text, therefore we're simply using the display text as the values and mapping them in the Options. This only works if the display text must be unique, otherwise you'll need to append (or prepend) the IDs to the text and match on that. If the IDs themselves are display friendly this would be a non-issue, but often that wouldn't be the case.
+1. Accept JSON data from the server representing the current schedule assignments, available games that can be assigned, and the number of sheets.
+2. A draw schedule can have a large number of draws, sheets, and games. Editing needs to be performant. Native JS or jQuery w/ standard selects is very slow.
+3. When a game is selected it needs to be removed from the pool of available games.
+4. When a game is de-selected it needs to be added back to the pool of available games.
+5. Datalists w/ inputs allow you to enter any value, and it might not be a valid game. Before sending the updated schedule to the server, invalid values needs to be removed.
+6. Post JSON data to the server on save.
 
 ## Running It
 
@@ -19,8 +18,3 @@ Installl elm-live if you don't already have it:
 
 Run the run script:
 `./run.sh`
-
-
-## TODO
-
-Potentially add timed headless browser tests.

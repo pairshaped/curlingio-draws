@@ -1,1 +1,1 @@
-elm-live src/DataList.elm src/Selects.elm --start-page=index.html --open -- --output=elm.js
+elm-live src/Main.elm --start-page=index.html --open -- --output=elm.js
