@@ -1,0 +1,27 @@
+{
+  "draws": [
+    {
+      "id": null,
+      "index": 0,
+      "starts_at": null,
+      "attendance": null
+    }
+  ],
+  "drawSheets" : [
+    {
+      "id": null,
+      "drawIndex": 0,
+      "sheetIndex": 0,
+      "gameId": 1,
+      "value": null
+    }
+  ],
+  "games" : [
+    {
+      "id": 1,
+      "name": "A vs B",
+      "disabled": true
+    }
+  ],
+  "number_of_sheets": 4
+}

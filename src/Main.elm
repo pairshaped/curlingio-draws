@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, button, datalist, div, input, p, text)
+import Html exposing (Html, button, datalist, div, input, option, p, text)
 import Html.Attributes exposing (class, disabled, id, list, name, value)
 import Html.Events exposing (onClick, onInput)
 import Html.Keyed as Keyed
@@ -16,9 +16,19 @@ main =
 -- MODELS
 
 
+type alias Draw =
+    { id : Maybe Int
+    , index : Int
+    , starts_at : Maybe Date
+    , attendance : Maybe Int
+    }
+
+
 type alias DrawSheet =
-    { id : Int
-    , value : String
+    { id : Maybe Int
+    , drawIndex : Int
+    , sheetIndex : Int
+    , value : Maybe String
     }
 
 
@@ -30,18 +40,25 @@ type alias Game =
 
 
 type alias Model =
-    { drawSheets : List DrawSheet
+    { draws : List Draw
+    , drawSheets : List DrawSheet
     , games : List Game
+    , numberOfSheets : Int
     }
 
 
 init =
-    { drawSheets =
-        List.repeat 128 0
-            |> List.indexedMap (\n _ -> DrawSheet (n + 1) "")
+    { draws =
+        List.repeat 12 0
+            |> List.indexedMap (\n _ -> DrawSheet Nothing n Nothing Nothing)
+    , drawSheets =
+        List.repeat 12 0
+            |> List.repeat 4 0
+            |> List.indexedMap (\n _ -> DrawSheet Nothing n "")
     , games =
         List.repeat 128 0
             |> List.indexedMap (\n _ -> Game (n + 1) ("Label for " ++ String.fromInt (n + 1)) False)
+    , numberOfSheets = 4
     }
 
 
@@ -61,7 +78,7 @@ getGameByName games name =
 
 type Msg
     = SelectedItem DrawSheet String
-    | ClearInvalidSelections
+    | Save
 
 
 updateGames : Model -> Model
@@ -97,7 +114,7 @@ update msg model =
             { model | drawSheets = updateDropDowns }
                 |> updateGames
 
-        ClearInvalidSelections ->
+        Save ->
             let
                 validDrawSheet drawSheet =
                     if List.any (\o -> o.name == drawSheet.value) model.games then
@@ -118,23 +135,43 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ p [] [ text "Used the datalist element to repeat a list of drawSheets that share the same games. When an game is selected in any of the drawSheets it will be disabled in the datalist and can't be selected again." ]
-        , datalist [ id "games" ] (List.map viewGame model.games)
-        , button [ onClick ClearInvalidSelections ] [ text "Clear invalid selections" ]
-        , viewDrawSheets model.drawSheets
+    div [ class "container" ]
+        [ viewHeader
+        , datalist [ id "games" ] (List.map viewGameOption model.games)
+        , viewDraws model.drawSheets
         ]
 
 
-viewGame : Game -> Html Msg
-viewGame game =
-    Html.game [ disabled game.disabled ] [ text game.name ]
+viewHeader : Html Msg
+viewHeader =
+    div [ class "row mt-4 mb-4" ]
+        [ div [ class "col-8" ] [ text "Instructions" ]
+        , div [ class "col-4" ]
+            [ div [ class "text-right" ]
+                [ button [ class "btn btn-primary", onClick Save ] [ text "Save" ]
+                ]
+            ]
+        ]
+
+
+viewGameOption : Game -> Html Msg
+viewGameOption game =
+    option [ disabled game.disabled ] [ text game.name ]
+
+
+viewDraws : List DrawSheet -> Html Msg
+viewDraws drawSheets =
+    div [ class "row" ]
+        [ div [ class "col-12" ]
+            [ viewDrawSheets drawSheets
+            ]
+        ]
 
 
 viewDrawSheets : List DrawSheet -> Html Msg
 viewDrawSheets drawSheets =
     Keyed.node "div"
-        [ class "container" ]
+        [ class "d-flex justify-content-between" ]
         (List.map viewKeyedDrawSheet drawSheets)
 
 
@@ -146,7 +183,8 @@ viewKeyedDrawSheet drawSheet =
 viewDrawSheet : DrawSheet -> Html Msg
 viewDrawSheet drawSheet =
     input
-        [ list "games"
+        [ class "m-1 p-1"
+        , list "games"
         , name (String.fromInt drawSheet.id)
         , onInput (SelectedItem drawSheet)
         , value drawSheet.value

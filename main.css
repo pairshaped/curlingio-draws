@@ -1,9 +1,0 @@
-.container {
-  display: "flex";
-  flex-wrap: "wrap";
-}
-
-input, select {
-  padding: 5px;
-  margin: 5px;
-}
