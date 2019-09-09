@@ -19,6 +19,7 @@ main =
 
 type alias Draw =
     { id : Int
+    , label : Maybe String
     , starts_at : Maybe String
     , attendance : Maybe Int
     , drawSheets : List DrawSheet
@@ -60,6 +61,7 @@ init =
 
 type Msg
     = SelectedItem Draw DrawSheet String
+    | UpdateDrawLabel Draw String
     | Save
 
 
@@ -109,6 +111,20 @@ update msg model =
             in
             { model | draws = updatedDraws }
                 |> updateGames
+
+        UpdateDrawLabel onDraw newLabel ->
+            let
+                updateDraw draw =
+                    if draw.id == onDraw.id then
+                        { draw | label = Just newLabel }
+
+                    else
+                        draw
+
+                updateDraws =
+                    List.map updateDraw model.draws
+            in
+            { model | draws = updateDraws }
 
         Save ->
             let
