@@ -62,6 +62,7 @@ init =
 type Msg
     = SelectedItem Draw DrawSheet String
     | UpdateDrawLabel Draw String
+    | UpdateAttendance Draw String
     | Save
 
 
@@ -117,6 +118,25 @@ update msg model =
                 updateDraw draw =
                     if draw.id == onDraw.id then
                         { draw | label = Just newLabel }
+
+                    else
+                        draw
+
+                updateDraws =
+                    List.map updateDraw model.draws
+            in
+            { model | draws = updateDraws }
+
+        UpdateAttendance onDraw newAttendance ->
+            let
+                updateDraw draw =
+                    if draw.id == onDraw.id then
+                        case String.toInt newAttendance of
+                            Just attendance ->
+                                { draw | attendance = Just attendance }
+
+                            Nothing ->
+                                draw
 
                     else
                         draw
