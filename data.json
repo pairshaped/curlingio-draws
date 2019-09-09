@@ -1,27 +1,168 @@
-{
-  "draws": [
-    {
-      "id": null,
-      "index": 0,
-      "starts_at": null,
-      "attendance": null
+{ "number_of_sheets": 4
+, "games" :
+  [ { "id": 1
+    , "name": "A vs B"
+    , "teams": [1, 2]
+    , "disabled": true
     }
-  ],
-  "drawSheets" : [
-    {
-      "id": null,
-      "drawIndex": 0,
-      "sheetIndex": 0,
-      "gameId": 1,
-      "value": null
+  , { "id": 2
+    , "name": "C vs D"
+    , "teams": [3, 4]
+    , "disabled": true
     }
-  ],
-  "games" : [
-    {
-      "id": 1,
-      "name": "A vs B",
-      "disabled": true
+  , { "id": 3
+    , "name": "E vs F"
+    , "teams": [5, 6]
+    , "disabled": true
     }
-  ],
-  "number_of_sheets": 4
+  , { "id": 4
+    , "name": "G vs H"
+    , "teams": [7, 8]
+    , "disabled": true
+    }
+  , { "id": 5
+    , "name": "F vs H"
+    , "teams": [6, 8]
+    , "disabled": true
+    }
+  , { "id": 6
+    , "name": "A vs C"
+    , "teams": [1, 3]
+    , "disabled": true
+    }
+  , { "id": 7
+    , "name": "B vs D"
+    , "teams": [2, 4]
+    , "disabled": true
+    }
+  , { "id": 8
+    , "name": "E vs G"
+    , "teams": [5, 6]
+    , "disabled": true
+    }
+  , { "id": 9
+    , "name": "E vs H"
+    , "teams": [5, 8]
+    , "disabled": true
+    }
+  , { "id": 10
+    , "name": "F vs G"
+    , "teams": [6, 7]
+    , "disabled": true
+    }
+  , { "id": 11
+    , "name": "A vs D"
+    , "teams": [1, 4]
+    , "disabled": true
+    }
+  , { "id": 12
+    , "name": "B vs C"
+    , "teams": [2, 3]
+    , "disabled": true
+    }
+  , { "id": 13
+    , "name": "F vs A"
+    , "teams": [6, 1]
+    , "disabled": true
+    }
+  , { "id": 14
+    , "name": "G vs B"
+    , "teams": [7, 2]
+    , "disabled": true
+    }
+  , { "id": 15
+    , "name": "H vs D"
+    , "teams": [8, 4]
+    , "disabled": true
+    }
+  , { "id": 16
+    , "name": "E vs C"
+    , "teams": [5, 3]
+    , "disabled": true
+    }
+  , { "id": 17
+    , "name": "E vs D"
+    , "teams": [5, 4]
+    , "disabled": true
+    }
+  , { "id": 18
+    , "name": "F vs B"
+    , "teams": [6, 2]
+    , "disabled": true
+    }
+  , { "id": 19
+    , "name": "G vs A"
+    , "teams": [7, 1]
+    , "disabled": true
+    }
+  , { "id": 20
+    , "name": "H vs C"
+    , "teams": [8, 3]
+    , "disabled": true
+    }
+  , { "id": 21
+    , "name": "E vs B"
+    , "teams": [5, 2]
+    , "disabled": true
+    }
+  , { "id": 22,
+    , "name": "F vs C",
+    , "teams": [6, 3]
+    , "disabled": true
+    }
+  , { "id": 23,
+    , "name": "G vs D",
+    , "teams": [7, 4]
+    , "disabled": true
+    }
+  , { "id": 24,
+    , "name": "H vs A",
+    , "teams": [8, 1]
+    , "disabled": true
+    }
+  , { "id": 25,
+    , "name": "H vs B",
+    , "teams": [8, 2]
+    , "disabled": true
+    }
+  , { "id": 26,
+    , "name": "E vs A",
+    , "teams": [5, 1]
+    , "disabled": true
+    }
+  , { "id": 27,
+    , "name": "F vs D",
+    , "teams": [6, 4]
+    , "disabled": true
+    }
+  , { "id": 28,
+    , "name": "G vs C",
+    , "teams": [7, 3]
+    , "disabled": true
+    }
+  ]
+, "draws":
+  [ { "id": 1
+    , "starts_at": null
+    , "attendance": null
+    , "draw_sheets":
+      [ { "sheet": 0
+        , "gameId": 1
+        , "value": "A vs B"
+        }
+      , { "sheet": 1
+        , "gameId": 2
+        , "value": "C vs D"
+        }
+      , { "sheet": 2
+        , "gameId": 3
+        , "value": "E vs F"
+        }
+      , { "sheet": 3
+        , "gameId": 4
+        , "value": "G vs H"
+        }
+      ]
+    }
+  ]
 }

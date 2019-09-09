@@ -6,6 +6,7 @@ import Html.Attributes exposing (class, disabled, id, list, name, value)
 import Html.Events exposing (onClick, onInput)
 import Html.Keyed as Keyed
 import Html.Lazy exposing (lazy)
+import List.Extra
 
 
 main =
@@ -17,59 +18,40 @@ main =
 
 
 type alias Draw =
-    { id : Maybe Int
-    , index : Int
-    , starts_at : Maybe Date
+    { id : Int
+    , starts_at : Maybe String
     , attendance : Maybe Int
+    , drawSheets : List DrawSheet
     }
 
 
 type alias DrawSheet =
-    { id : Maybe Int
-    , drawIndex : Int
-    , sheetIndex : Int
-    , value : Maybe String
+    { sheet : Int
+    , gameId : Maybe Int
+    , value : String
     }
 
 
 type alias Game =
     { id : Int
     , name : String
+    , teams : ( Int, Int )
     , disabled : Bool
     }
 
 
 type alias Model =
-    { draws : List Draw
-    , drawSheets : List DrawSheet
+    { numberOfSheets : Int
     , games : List Game
-    , numberOfSheets : Int
+    , draws : List Draw
     }
 
 
 init =
-    { draws =
-        List.repeat 12 0
-            |> List.indexedMap (\n _ -> DrawSheet Nothing n Nothing Nothing)
-    , drawSheets =
-        List.repeat 12 0
-            |> List.repeat 4 0
-            |> List.indexedMap (\n _ -> DrawSheet Nothing n "")
-    , games =
-        List.repeat 128 0
-            |> List.indexedMap (\n _ -> Game (n + 1) ("Label for " ++ String.fromInt (n + 1)) False)
-    , numberOfSheets = 4
+    { numberOfSheets = 4
+    , games = []
+    , draws = []
     }
-
-
-
--- HELPERS
-
-
-getGameByName : List Game -> String -> Maybe Game
-getGameByName games name =
-    List.filter (\o -> o.name == name) games
-        |> List.head
 
 
 
@@ -77,7 +59,7 @@ getGameByName games name =
 
 
 type Msg
-    = SelectedItem DrawSheet String
+    = SelectedItem Draw DrawSheet String
     | Save
 
 
@@ -85,11 +67,18 @@ updateGames : Model -> Model
 updateGames model =
     let
         -- Loop through the games setting each to disabled if a matching drawSheet value is the same as it's name
-        gameIsSelected : Game -> Bool
-        gameIsSelected game =
-            List.any (\d -> d.value == game.name) model.drawSheets
+        gameIsSelectedInDraw game draw =
+            case List.Extra.find (.value >> (==) game.name) draw.drawSheets of
+                Just drawSheet ->
+                    True
 
-        updateGame : Game -> Game
+                Nothing ->
+                    False
+
+        gameIsSelected game =
+            List.map (gameIsSelectedInDraw game) model.draws
+                |> List.member True
+
         updateGame game =
             { game | disabled = gameIsSelected game }
     in
@@ -99,34 +88,45 @@ updateGames model =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        SelectedItem onDropDown value ->
+        SelectedItem onDraw onDrawSheet value ->
             let
-                updateDropDown drawSheet =
-                    if drawSheet.id == onDropDown.id then
+                updatedDrawSheet drawSheet =
+                    if drawSheet.sheet == onDrawSheet.sheet then
                         { drawSheet | value = value }
 
                     else
                         drawSheet
 
-                updateDropDowns =
-                    List.map updateDropDown model.drawSheets
+                updatedDrawSheets draw =
+                    if draw.id == onDraw.id then
+                        { draw | drawSheets = List.map updatedDrawSheet draw.drawSheets }
+
+                    else
+                        draw
+
+                updatedDraws =
+                    List.map updatedDrawSheets model.draws
             in
-            { model | drawSheets = updateDropDowns }
+            { model | draws = updatedDraws }
                 |> updateGames
 
         Save ->
             let
-                validDrawSheet drawSheet =
-                    if List.any (\o -> o.name == drawSheet.value) model.games then
-                        drawSheet
+                updatedDrawSheet drawSheet =
+                    case List.Extra.find (.name >> (==) drawSheet.value) model.games of
+                        Just game ->
+                            { drawSheet | gameId = Just game.id }
 
-                    else
-                        { drawSheet | value = "" }
+                        Nothing ->
+                            { drawSheet | gameId = Nothing, value = "" }
 
-                validDrawSheets =
-                    List.map validDrawSheet model.drawSheets
+                updatedDraw draw =
+                    { draw | drawSheets = List.map updatedDrawSheet draw.drawSheets }
+
+                updatedDraws =
+                    List.map updatedDraw model.draws
             in
-            { model | drawSheets = validDrawSheets }
+            { model | draws = updatedDraws }
 
 
 
@@ -138,7 +138,7 @@ view model =
     div [ class "container" ]
         [ viewHeader
         , datalist [ id "games" ] (List.map viewGameOption model.games)
-        , viewDraws model.drawSheets
+        , viewDraws model.draws
         ]
 
 
@@ -159,34 +159,36 @@ viewGameOption game =
     option [ disabled game.disabled ] [ text game.name ]
 
 
-viewDraws : List DrawSheet -> Html Msg
-viewDraws drawSheets =
-    div [ class "row" ]
-        [ div [ class "col-12" ]
-            [ viewDrawSheets drawSheets
-            ]
-        ]
+viewDraws : List Draw -> Html Msg
+viewDraws draws =
+    Keyed.node "div"
+        []
+        (List.map viewKeyedDraw draws)
 
 
-viewDrawSheets : List DrawSheet -> Html Msg
-viewDrawSheets drawSheets =
+viewKeyedDraw : Draw -> ( String, Html Msg )
+viewKeyedDraw draw =
+    ( String.fromInt draw.id, lazy viewDraw draw )
+
+
+viewDraw : Draw -> Html Msg
+viewDraw draw =
     Keyed.node "div"
         [ class "d-flex justify-content-between" ]
-        (List.map viewKeyedDrawSheet drawSheets)
+        (List.map (viewKeyedDrawSheet draw) draw.drawSheets)
 
 
-viewKeyedDrawSheet : DrawSheet -> ( String, Html Msg )
-viewKeyedDrawSheet drawSheet =
-    ( String.fromInt drawSheet.id, lazy viewDrawSheet drawSheet )
+viewKeyedDrawSheet : Draw -> DrawSheet -> ( String, Html Msg )
+viewKeyedDrawSheet draw drawSheet =
+    ( String.fromInt draw.id ++ String.fromInt drawSheet.sheet, lazy (viewDrawSheet draw) drawSheet )
 
 
-viewDrawSheet : DrawSheet -> Html Msg
-viewDrawSheet drawSheet =
+viewDrawSheet : Draw -> DrawSheet -> Html Msg
+viewDrawSheet draw drawSheet =
     input
         [ class "m-1 p-1"
         , list "games"
-        , name (String.fromInt drawSheet.id)
-        , onInput (SelectedItem drawSheet)
+        , onInput (SelectedItem draw drawSheet)
         , value drawSheet.value
         ]
         []
