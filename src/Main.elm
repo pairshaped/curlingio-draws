@@ -1,69 +1,27 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, button, datalist, div, input, option, p, text)
-import Html.Attributes exposing (class, disabled, id, list, name, value)
-import Html.Events exposing (onClick, onInput)
-import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy)
 import List.Extra
+import Types exposing (..)
+import Views exposing (view)
 
 
 main =
-    Browser.sandbox { init = init, update = update, view = view }
+    Browser.element
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
 
 
-
--- MODELS
-
-
-type alias Draw =
-    { id : Int
-    , label : Maybe String
-    , starts_at : Maybe String
-    , attendance : Maybe Int
-    , drawSheets : List DrawSheet
-    }
-
-
-type alias DrawSheet =
-    { sheet : Int
-    , gameId : Maybe Int
-    , value : String
-    }
-
-
-type alias Game =
-    { id : Int
-    , name : String
-    , teams : ( Int, Int )
-    , disabled : Bool
-    }
-
-
-type alias Model =
-    { numberOfSheets : Int
-    , games : List Game
-    , draws : List Draw
-    }
-
-
-init =
-    { numberOfSheets = 4
-    , games = []
-    , draws = []
-    }
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    ( { flags = flags, remoteData = Loading }, getData flags.url )
 
 
 
 -- UPDATE
-
-
-type Msg
-    = SelectedItem Draw DrawSheet String
-    | UpdateDrawLabel Draw String
-    | UpdateAttendance Draw String
-    | Save
 
 
 updateGames : Model -> Model
@@ -88,7 +46,7 @@ updateGames model =
     { model | games = List.map updateGame model.games }
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectedItem onDraw onDrawSheet value ->
@@ -110,8 +68,10 @@ update msg model =
                 updatedDraws =
                     List.map updatedDrawSheets model.draws
             in
-            { model | draws = updatedDraws }
+            ( { model | draws = updatedDraws }
                 |> updateGames
+            , Cmd.none
+            )
 
         UpdateDrawLabel onDraw newLabel ->
             let
@@ -125,7 +85,7 @@ update msg model =
                 updateDraws =
                     List.map updateDraw model.draws
             in
-            { model | draws = updateDraws }
+            ( { model | draws = updateDraws }, Cmd.none )
 
         UpdateAttendance onDraw newAttendance ->
             let
@@ -144,9 +104,9 @@ update msg model =
                 updateDraws =
                     List.map updateDraw model.draws
             in
-            { model | draws = updateDraws }
+            ( { model | draws = updateDraws }, Cmd.none )
 
-        Save ->
+        SaveData ->
             let
                 updatedDrawSheet drawSheet =
                     case List.Extra.find (.name >> (==) drawSheet.value) model.games of
@@ -162,69 +122,51 @@ update msg model =
                 updatedDraws =
                     List.map updatedDraw model.draws
             in
-            { model | draws = updatedDraws }
+            ( { model | draws = updatedDraws }, Cmd.none )
+
+        GotData result ->
+            case result of
+                Ok remoteData ->
+                    ( { model | remoteData = Success remoteData }, Cmd.none )
+
+                Err err ->
+                    let
+                        errorMessage =
+                            case err of
+                                Http.BadUrl string ->
+                                    "Invalid URL used to fetch the data: " ++ string
+
+                                Http.Timeout ->
+                                    "Network timeout when trying to fetch the data."
+
+                                Http.NetworkError ->
+                                    "Network timeout when trying to fetch the data."
+
+                                Http.BadStatus int ->
+                                    "Invalid response status from server when trying to fetch the data."
+
+                                Http.BadBody string ->
+                                    "Invalid response body from server when trying to fetch the data."
+                    in
+                    ( { model | remoteData = Failure errorMessage }, Cmd.none )
 
 
 
--- VIEW
+-- SUBSCRIPTIONS
 
 
-view : Model -> Html Msg
-view model =
-    div [ class "container" ]
-        [ viewHeader
-        , datalist [ id "games" ] (List.map viewGameOption model.games)
-        , viewDraws model.draws
-        ]
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
 
 
-viewHeader : Html Msg
-viewHeader =
-    div [ class "row mt-4 mb-4" ]
-        [ div [ class "col-8" ] [ text "Instructions" ]
-        , div [ class "col-4" ]
-            [ div [ class "text-right" ]
-                [ button [ class "btn btn-primary", onClick Save ] [ text "Save" ]
-                ]
-            ]
-        ]
+
+-- HTTP
 
 
-viewGameOption : Game -> Html Msg
-viewGameOption game =
-    option [ disabled game.disabled ] [ text game.name ]
-
-
-viewDraws : List Draw -> Html Msg
-viewDraws draws =
-    Keyed.node "div"
-        []
-        (List.map viewKeyedDraw draws)
-
-
-viewKeyedDraw : Draw -> ( String, Html Msg )
-viewKeyedDraw draw =
-    ( String.fromInt draw.id, lazy viewDraw draw )
-
-
-viewDraw : Draw -> Html Msg
-viewDraw draw =
-    Keyed.node "div"
-        [ class "d-flex justify-content-between" ]
-        (List.map (viewKeyedDrawSheet draw) draw.drawSheets)
-
-
-viewKeyedDrawSheet : Draw -> DrawSheet -> ( String, Html Msg )
-viewKeyedDrawSheet draw drawSheet =
-    ( String.fromInt draw.id ++ String.fromInt drawSheet.sheet, lazy (viewDrawSheet draw) drawSheet )
-
-
-viewDrawSheet : Draw -> DrawSheet -> Html Msg
-viewDrawSheet draw drawSheet =
-    input
-        [ class "m-1 p-1"
-        , list "games"
-        , onInput (SelectedItem draw drawSheet)
-        , value drawSheet.value
-        ]
-        []
+getData : String -> Cmd Msg
+getData url section =
+    Http.get
+        { url = url
+        , expect = Http.expectJson GotData dataDecoder
+        }

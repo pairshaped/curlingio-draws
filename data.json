@@ -147,19 +147,19 @@
     , "attendance": null
     , "draw_sheets":
       [ { "sheet": 0
-        , "gameId": 1
+        , "game_id": 1
         , "value": "A vs B"
         }
       , { "sheet": 1
-        , "gameId": 2
+        , "game_id": 2
         , "value": "C vs D"
         }
       , { "sheet": 2
-        , "gameId": 3
+        , "game_id": 3
         , "value": "E vs F"
         }
       , { "sheet": 3
-        , "gameId": 4
+        , "game_id": 4
         , "value": "G vs H"
         }
       ]
