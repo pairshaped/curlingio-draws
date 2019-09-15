@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Browser
+import Http
 import List.Extra
 import Types exposing (..)
 import Views exposing (view)
@@ -36,14 +37,25 @@ updateGames model =
                 Nothing ->
                     False
 
-        gameIsSelected game =
-            List.map (gameIsSelectedInDraw game) model.draws
+        gameIsSelected draws game =
+            List.map (gameIsSelectedInDraw game) draws
                 |> List.member True
 
-        updateGame game =
-            { game | disabled = gameIsSelected game }
+        updatedGame draws game =
+            { game | disabled = gameIsSelected draws game }
+
+        updatedGames games draws =
+            List.map (updatedGame draws) games
+
+        remoteData =
+            case model.remoteData of
+                Success decodedData ->
+                    Success { decodedData | games = updatedGames decodedData.games decodedData.draws }
+
+                _ ->
+                    model.remoteData
     in
-    { model | games = List.map updateGame model.games }
+    { model | remoteData = remoteData }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -65,31 +77,47 @@ update msg model =
                     else
                         draw
 
-                updatedDraws =
-                    List.map updatedDrawSheets model.draws
+                updatedDraws draws =
+                    List.map updatedDrawSheets draws
+
+                remoteData =
+                    case model.remoteData of
+                        Success decodedData ->
+                            Success { decodedData | draws = updatedDraws decodedData.draws }
+
+                        _ ->
+                            model.remoteData
             in
-            ( { model | draws = updatedDraws }
+            ( { model | remoteData = remoteData }
                 |> updateGames
             , Cmd.none
             )
 
         UpdateDrawLabel onDraw newLabel ->
             let
-                updateDraw draw =
+                updatedDraw draw =
                     if draw.id == onDraw.id then
                         { draw | label = Just newLabel }
 
                     else
                         draw
 
-                updateDraws =
-                    List.map updateDraw model.draws
+                updatedDraws draws =
+                    List.map updatedDraw draws
+
+                remoteData =
+                    case model.remoteData of
+                        Success decodedData ->
+                            Success { decodedData | draws = updatedDraws decodedData.draws }
+
+                        _ ->
+                            model.remoteData
             in
-            ( { model | draws = updateDraws }, Cmd.none )
+            ( { model | remoteData = remoteData }, Cmd.none )
 
         UpdateAttendance onDraw newAttendance ->
             let
-                updateDraw draw =
+                updatedDraw draw =
                     if draw.id == onDraw.id then
                         case String.toInt newAttendance of
                             Just attendance ->
@@ -101,33 +129,49 @@ update msg model =
                     else
                         draw
 
-                updateDraws =
-                    List.map updateDraw model.draws
+                updatedDraws draws =
+                    List.map updatedDraw draws
+
+                remoteData =
+                    case model.remoteData of
+                        Success decodedData ->
+                            Success { decodedData | draws = updatedDraws decodedData.draws }
+
+                        _ ->
+                            model.remoteData
             in
-            ( { model | draws = updateDraws }, Cmd.none )
+            ( { model | remoteData = remoteData }, Cmd.none )
 
         SaveData ->
             let
-                updatedDrawSheet drawSheet =
-                    case List.Extra.find (.name >> (==) drawSheet.value) model.games of
+                updatedDrawSheet games drawSheet =
+                    case List.Extra.find (.name >> (==) drawSheet.value) games of
                         Just game ->
                             { drawSheet | gameId = Just game.id }
 
                         Nothing ->
                             { drawSheet | gameId = Nothing, value = "" }
 
-                updatedDraw draw =
-                    { draw | drawSheets = List.map updatedDrawSheet draw.drawSheets }
+                updatedDraw games draw =
+                    { draw | drawSheets = List.map (updatedDrawSheet games) draw.drawSheets }
 
-                updatedDraws =
-                    List.map updatedDraw model.draws
+                updatedDraws games draws =
+                    List.map (updatedDraw games) draws
+
+                remoteData =
+                    case model.remoteData of
+                        Success decodedData ->
+                            Success { decodedData | draws = updatedDraws decodedData.games decodedData.draws }
+
+                        _ ->
+                            model.remoteData
             in
-            ( { model | draws = updatedDraws }, Cmd.none )
+            ( { model | remoteData = remoteData }, Cmd.none )
 
         GotData result ->
             case result of
-                Ok remoteData ->
-                    ( { model | remoteData = Success remoteData }, Cmd.none )
+                Ok data ->
+                    ( { model | remoteData = Success data }, Cmd.none )
 
                 Err err ->
                     let
@@ -165,7 +209,7 @@ subscriptions model =
 
 
 getData : String -> Cmd Msg
-getData url section =
+getData url =
     Http.get
         { url = url
         , expect = Http.expectJson GotData dataDecoder

@@ -10,11 +10,19 @@ import Types exposing (..)
 
 view : Model -> Html Msg
 view model =
-    div [ class "container" ]
-        [ viewHeader
-        , datalist [ id "games" ] (List.map viewGameOption model.games)
-        , viewDraws model.draws
-        ]
+    case model.remoteData of
+        Failure message ->
+            text message
+
+        Loading ->
+            text "Loading..."
+
+        Success decodedData ->
+            div [ class "container" ]
+                [ viewHeader
+                , datalist [ id "games" ] (List.map viewGameOption decodedData.games)
+                , viewDraws decodedData.draws
+                ]
 
 
 viewHeader : Html Msg

@@ -1,11 +1,45 @@
 module Types exposing (..)
 
 import Http
-import Json.Decode exposing (Decoder, field, int, list, maybe, string, succeed)
+import Json.Decode exposing (Decoder, bool, field, index, int, list, map2, map3, map4, map5, maybe, string)
+
+
+type Msg
+    = GotData (Result Http.Error RemoteData)
+    | SaveData
+    | SelectedItem Draw DrawSheet String
+    | UpdateDrawLabel Draw String
+    | UpdateAttendance Draw String
 
 
 type alias Flags =
     { url : String
+    }
+
+
+type alias Model =
+    { remoteData : RemoteData
+    }
+
+
+type RemoteData
+    = Failure String
+    | Loading
+    | Success Data
+
+
+type alias Data =
+    { numberOfSheets : Int
+    , games : List Game
+    , draws : List Draw
+    }
+
+
+type alias Game =
+    { id : Int
+    , name : String
+    , teams : ( Int, Int )
+    , disabled : Bool
     }
 
 
@@ -25,68 +59,41 @@ type alias DrawSheet =
     }
 
 
-type alias Game =
-    { id : Int
-    , name : String
-    , teams : ( Int, Int )
-    , disabled : Bool
-    }
-
-
-type alias Data =
-    { numberOfSheets : Int
-    , games : List Game
-    , draws : List Draw
-    }
-
-
-type RemoteData
-    = Failure String
-    | Loading
-    | Success Data
-
-
-type alias Model =
-    { remoteData : RemoteData }
-
-
-type Msg
-    = GotData (Result Http.Error RemoteData)
-    | SaveData
-    | SelectedItem Draw DrawSheet String
-    | UpdateDrawLabel Draw String
-    | UpdateAttendance Draw String
-
-
 dataDecoder : Decoder Data
 dataDecoder =
-    Json.Decode.map3 Data
+    map3 Data
         (field "number_of_sheets" int)
-        (list "games" gameDecoder)
-        (list "draws" drawDecoder)
+        (list gameDecoder)
+        (list drawDecoder)
 
 
 gameDecoder : Decoder Game
 gameDecoder =
-    Json.Decode.map4 Game
+    map4 Game
         (field "id" int)
         (field "name" string)
-        (list "teams" int)
+        (field "teams" teamsDecoder)
         (field "disabled" bool)
 
 
 drawDecoder : Decoder Draw
 drawDecoder =
-    Json.Decode.map4 Draw
+    map5 Draw
         (field "id" int)
-        (field "starts_at" string)
-        (field "attendance" int)
-        (list "draw_sheets" drawSheetDecoder)
+        (maybe (field "label" string))
+        (maybe (field "starts_at" string))
+        (maybe (field "attendance" int))
+        (list drawSheetDecoder)
 
 
 drawSheetDecoder : Decoder DrawSheet
 drawSheetDecoder =
-    Json.Decode.map3 DrawSheet
+    map3 DrawSheet
         (field "sheet" int)
-        (field "game_id" int)
+        (maybe (field "game_id" int))
         (field "value" string)
+
+
+teamsDecoder : Decoder ( Int, Int )
+teamsDecoder =
+    map2 Tuple.pair (index 0 int) (index 1 int)
