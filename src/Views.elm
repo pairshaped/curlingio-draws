@@ -47,7 +47,7 @@ viewHeader =
 
 viewGameOption : Game -> Html Msg
 viewGameOption game =
-    option [ disabled game.disabled ] [ text game.name ]
+    option [ disabled game.disabled, value game.name ] []
 
 
 viewDraws : List Draw -> Html Msg
