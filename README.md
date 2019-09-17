@@ -11,9 +11,14 @@ This is the draw sheet editor for Curling I/O.
 5. Datalists w/ inputs allow you to enter any value, and it might not be a valid game. Before sending the updated schedule to the server, invalid values needs to be removed.
 6. Post JSON data to the server on save.
 
-## Running It
+## Installing Dependencies
 
 ```
 yarn
+```
+
+## Running It
+
+```
 yarn start
 ```
