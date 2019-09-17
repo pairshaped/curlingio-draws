@@ -5,7 +5,7 @@ import Json.Decode exposing (Decoder, bool, field, index, int, list, map2, map3,
 
 
 type Msg
-    = GotData (Result Http.Error RemoteData)
+    = GotData (Result Http.Error Data)
     | SaveData
     | SelectedItem Draw DrawSheet String
     | UpdateDrawLabel Draw String
@@ -17,15 +17,17 @@ type alias Flags =
     }
 
 
-type alias Model =
-    { remoteData : RemoteData
-    }
-
-
 type RemoteData
-    = Failure String
+    = NotAsked
     | Loading
+    | Failure String
     | Success Data
+
+
+type alias Model =
+    { flags : Flags
+    , data : RemoteData
+    }
 
 
 type alias Data =
@@ -63,8 +65,8 @@ dataDecoder : Decoder Data
 dataDecoder =
     map3 Data
         (field "number_of_sheets" int)
-        (list gameDecoder)
-        (list drawDecoder)
+        (field "games" (list gameDecoder))
+        (field "draws" (list drawDecoder))
 
 
 gameDecoder : Decoder Game
@@ -76,6 +78,11 @@ gameDecoder =
         (field "disabled" bool)
 
 
+teamsDecoder : Decoder ( Int, Int )
+teamsDecoder =
+    map2 Tuple.pair (index 0 int) (index 1 int)
+
+
 drawDecoder : Decoder Draw
 drawDecoder =
     map5 Draw
@@ -83,7 +90,7 @@ drawDecoder =
         (maybe (field "label" string))
         (maybe (field "starts_at" string))
         (maybe (field "attendance" int))
-        (list drawSheetDecoder)
+        (field "draw_sheets" (list drawSheetDecoder))
 
 
 drawSheetDecoder : Decoder DrawSheet
@@ -92,8 +99,3 @@ drawSheetDecoder =
         (field "sheet" int)
         (maybe (field "game_id" int))
         (field "value" string)
-
-
-teamsDecoder : Decoder ( Int, Int )
-teamsDecoder =
-    map2 Tuple.pair (index 0 int) (index 1 int)

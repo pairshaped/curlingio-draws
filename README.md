@@ -13,8 +13,7 @@ This is the draw sheet editor for Curling I/O.
 
 ## Running It
 
-Installl elm-live if you don't already have it:
-`npm install elm-live -g`
-
-Run the run script:
-`./run.sh`
+```
+yarn
+yarn start
+```
