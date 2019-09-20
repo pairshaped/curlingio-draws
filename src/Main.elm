@@ -157,6 +157,31 @@ update msg model =
             in
             ( { model | data = updatedData }, Cmd.none )
 
+        AddDraw ->
+            let
+                newDrawSheet idx sheet =
+                    DrawSheet idx Nothing ""
+
+                updatedDraws sheets draws =
+                    let
+                        nextId =
+                            Just (List.length draws + 1)
+
+                        nextLabel =
+                            Just (String.fromInt (List.length draws + 1))
+                    in
+                    draws ++ [ Draw nextId nextLabel Nothing Nothing (List.indexedMap newDrawSheet sheets) ]
+
+                updatedData =
+                    case model.data of
+                        Success decodedData ->
+                            Success { decodedData | draws = updatedDraws decodedData.sheets decodedData.draws }
+
+                        _ ->
+                            model.data
+            in
+            ( { model | data = updatedData }, Cmd.none )
+
         SaveData ->
             let
                 updatedDrawSheet games drawSheet =

@@ -28,6 +28,7 @@ viewData data =
         [ viewHeader
         , datalist [ id "games" ] (List.map viewGameOption data.games)
         , viewDrawsContainer data
+        , viewFooter
         ]
 
 
@@ -160,4 +161,11 @@ viewAttendance draw =
                 )
             ]
             []
+        ]
+
+
+viewFooter : Html Msg
+viewFooter =
+    div [ class "ml-1" ]
+        [ button [ class "btn btn-primary", onClick AddDraw ] [ text "Add Draw" ]
         ]

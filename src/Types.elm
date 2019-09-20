@@ -7,6 +7,7 @@ import Json.Decode exposing (Decoder, bool, field, index, int, list, map2, map3,
 type Msg
     = GotData (Result Http.Error Data)
     | SaveData
+    | AddDraw
     | SelectedItem Draw DrawSheet String
     | UpdateDrawLabel Draw String
     | UpdateDrawStartsAt Draw String
@@ -47,7 +48,7 @@ type alias Game =
 
 
 type alias Draw =
-    { id : Int
+    { id : Maybe Int
     , label : Maybe String
     , startsAt : Maybe String
     , attendance : Maybe Int
@@ -87,7 +88,7 @@ teamsDecoder =
 drawDecoder : Decoder Draw
 drawDecoder =
     map5 Draw
-        (field "id" int)
+        (maybe (field "id" int))
         (maybe (field "label" string))
         (maybe (field "starts_at" string))
         (maybe (field "attendance" int))
