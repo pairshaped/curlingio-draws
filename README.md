@@ -22,3 +22,16 @@ yarn
 ```
 yarn start
 ```
+
+## TODO
+
+- [ ] Swap Draw ID for Draw Position / Index. ID will be a reference to the backing server / database.
+- [ ] Look into using an Array instead of a List for draws
+- [ ] Look into using an Array instead of a List for draw sheets
+- [ ] Potential helper method for decoding data in the update
+- [ ] Implement save / serilization
+- [ ] Hide attendance for events that don't need to track it.
+- [ ] Prevent a team from playing more than once on the same draw sheet.
+- [ ] Implement a reset to undo changes since last save. (re-fetch JSON)
+- [ ] Highlight fields that have changed since last save.
+- [ ] Draw Schedule generation / regeneration based on games, dates, sheets, exclusions, etc.
