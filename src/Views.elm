@@ -145,9 +145,10 @@ viewDrawSheet draw drawSheet =
 viewAttendance : Draw -> Html Msg
 viewAttendance draw =
     td
-        [ class "draw_attendance p-1", style "min-width" "70px", style "max-width" "90px" ]
+        [ class "draw_attendance p-1", style "min-width" "70px", style "max-width" "120px" ]
         [ input
             [ class "form-control"
+            , type_ "number"
             , onInput (UpdateDrawAttendance draw)
             , value
                 (case draw.attendance of
