@@ -108,7 +108,29 @@ update msg model =
             in
             ( { model | data = updatedData }, Cmd.none )
 
-        UpdateAttendance onDraw newAttendance ->
+        UpdateDrawStartsAt onDraw newStartsAt ->
+            let
+                updatedDraw draw =
+                    if draw.id == onDraw.id then
+                        { draw | startsAt = Just newStartsAt }
+
+                    else
+                        draw
+
+                updatedDraws draws =
+                    List.map updatedDraw draws
+
+                updatedData =
+                    case model.data of
+                        Success decodedData ->
+                            Success { decodedData | draws = updatedDraws decodedData.draws }
+
+                        _ ->
+                            model.data
+            in
+            ( { model | data = updatedData }, Cmd.none )
+
+        UpdateDrawAttendance onDraw newAttendance ->
             let
                 updatedDraw draw =
                     if draw.id == onDraw.id then

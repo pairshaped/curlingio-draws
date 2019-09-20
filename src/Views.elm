@@ -1,10 +1,8 @@
 module Views exposing (view)
 
 import Html exposing (Html, button, datalist, div, input, option, p, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class, disabled, id, list, name, value)
+import Html.Attributes exposing (class, disabled, id, list, name, style, type_, value)
 import Html.Events exposing (onClick, onInput)
-import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy)
 import Types exposing (..)
 
 
@@ -45,18 +43,28 @@ viewHeader =
         ]
 
 
+viewGameOption : Game -> Html Msg
+viewGameOption game =
+    option [ disabled game.disabled, value game.name ] []
+
+
 viewDrawsContainer : Data -> Html Msg
 viewDrawsContainer data =
-    table [ class "draws-container table table-sm table-borderless table-striped" ]
-        [ viewSheets data.sheets
-        , viewDraws data.draws
+    div
+        [ class "table-responsive" ]
+        [ table
+            [ class "draws-container table table-sm table-borderless table-striped" ]
+            [ viewSheets data.sheets
+            , viewDraws data.draws
+            ]
         ]
 
 
 viewSheets : List String -> Html Msg
 viewSheets sheets =
     thead []
-        [ tr [] (List.map viewSheet sheets)
+        [ tr []
+            (List.map viewSheet ((sheets |> (::) "Starts at" |> (::) "Label") ++ [ "Attend" ]))
         ]
 
 
@@ -65,43 +73,90 @@ viewSheet sheet =
     th [ class "pl-2 pb-2" ] [ text sheet ]
 
 
-viewGameOption : Game -> Html Msg
-viewGameOption game =
-    option [ disabled game.disabled, value game.name ] []
-
-
 viewDraws : List Draw -> Html Msg
 viewDraws draws =
-    Keyed.node "tbody"
+    tbody
         [ class "draws" ]
-        (List.map viewKeyedDraw draws)
-
-
-viewKeyedDraw : Draw -> ( String, Html Msg )
-viewKeyedDraw draw =
-    ( String.fromInt draw.id, lazy viewDraw draw )
+        (List.map viewDraw draws)
 
 
 viewDraw : Draw -> Html Msg
 viewDraw draw =
-    Keyed.node "tr"
+    tr
         [ class "draw" ]
-        (List.map (viewKeyedDrawSheet draw) draw.drawSheets)
+        ((List.map (viewDrawSheet draw) draw.drawSheets |> (::) (viewStartsAt draw) |> (::) (viewDrawLabel draw)) ++ [ viewAttendance draw ])
 
 
-viewKeyedDrawSheet : Draw -> DrawSheet -> ( String, Html Msg )
-viewKeyedDrawSheet draw drawSheet =
-    ( String.fromInt draw.id ++ String.fromInt drawSheet.sheet, lazy (viewDrawSheet draw) drawSheet )
+viewDrawLabel : Draw -> Html Msg
+viewDrawLabel draw =
+    td
+        [ class "draw_label p-1", style "min-width" "70px", style "max-width" "120px" ]
+        [ input
+            [ class "form-control"
+            , onInput (UpdateDrawLabel draw)
+            , value
+                (case draw.label of
+                    Just label ->
+                        label
+
+                    Nothing ->
+                        ""
+                )
+            ]
+            []
+        ]
+
+
+viewStartsAt : Draw -> Html Msg
+viewStartsAt draw =
+    td
+        [ class "draw_starts-at p-1", style "min-width" "275px", style "max-width" "275px" ]
+        [ input
+            [ class "form-control"
+            , onInput (UpdateDrawStartsAt draw)
+            , type_ "datetime-local"
+            , value
+                (case draw.startsAt of
+                    Just startsAt ->
+                        startsAt
+
+                    Nothing ->
+                        ""
+                )
+            ]
+            []
+        ]
 
 
 viewDrawSheet : Draw -> DrawSheet -> Html Msg
 viewDrawSheet draw drawSheet =
-    td [ class "draw-sheet p-2" ]
+    td
+        [ class "draw_sheet p-1", style "min-width" "120px", style "max-width" "180px" ]
         [ input
             [ class "form-control"
             , list "games"
             , onInput (SelectedItem draw drawSheet)
             , value drawSheet.value
+            ]
+            []
+        ]
+
+
+viewAttendance : Draw -> Html Msg
+viewAttendance draw =
+    td
+        [ class "draw_attendance p-1", style "min-width" "70px", style "max-width" "90px" ]
+        [ input
+            [ class "form-control"
+            , onInput (UpdateDrawAttendance draw)
+            , value
+                (case draw.attendance of
+                    Just attendance ->
+                        String.fromInt attendance
+
+                    Nothing ->
+                        ""
+                )
             ]
             []
         ]

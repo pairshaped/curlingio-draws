@@ -9,7 +9,8 @@ type Msg
     | SaveData
     | SelectedItem Draw DrawSheet String
     | UpdateDrawLabel Draw String
-    | UpdateAttendance Draw String
+    | UpdateDrawStartsAt Draw String
+    | UpdateDrawAttendance Draw String
 
 
 type alias Flags =
@@ -48,7 +49,7 @@ type alias Game =
 type alias Draw =
     { id : Int
     , label : Maybe String
-    , starts_at : Maybe String
+    , startsAt : Maybe String
     , attendance : Maybe Int
     , drawSheets : List DrawSheet
     }
