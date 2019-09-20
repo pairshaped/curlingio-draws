@@ -1,5 +1,10 @@
 { "data" :
-  { "number_of_sheets" : 4
+  { "sheets" :
+    [ "Sheet A"
+    , "Sheet B"
+    , "Sheet C"
+    , "Sheet D"
+    ]
   , "games" :
     [ { "id": 1
       , "name": "A vs B"

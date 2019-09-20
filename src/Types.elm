@@ -31,7 +31,7 @@ type alias Model =
 
 
 type alias Data =
-    { numberOfSheets : Int
+    { sheets : List String
     , games : List Game
     , draws : List Draw
     }
@@ -64,7 +64,7 @@ type alias DrawSheet =
 dataDecoder : Decoder Data
 dataDecoder =
     map3 Data
-        (field "number_of_sheets" int)
+        (field "sheets" (list string))
         (field "games" (list gameDecoder))
         (field "draws" (list drawDecoder))
 

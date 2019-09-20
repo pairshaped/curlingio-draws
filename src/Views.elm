@@ -1,6 +1,6 @@
 module Views exposing (view)
 
-import Html exposing (Html, button, datalist, div, input, option, p, text)
+import Html exposing (Html, button, datalist, div, input, option, p, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, disabled, id, list, name, value)
 import Html.Events exposing (onClick, onInput)
 import Html.Keyed as Keyed
@@ -29,7 +29,7 @@ viewData data =
     div [ class "container" ]
         [ viewHeader
         , datalist [ id "games" ] (List.map viewGameOption data.games)
-        , viewDraws data.draws
+        , viewDrawsContainer data
         ]
 
 
@@ -45,6 +45,26 @@ viewHeader =
         ]
 
 
+viewDrawsContainer : Data -> Html Msg
+viewDrawsContainer data =
+    table [ class "draws-container table table-sm table-borderless table-striped" ]
+        [ viewSheets data.sheets
+        , viewDraws data.draws
+        ]
+
+
+viewSheets : List String -> Html Msg
+viewSheets sheets =
+    thead []
+        [ tr [] (List.map viewSheet sheets)
+        ]
+
+
+viewSheet : String -> Html Msg
+viewSheet sheet =
+    th [ class "pl-2 pb-2" ] [ text sheet ]
+
+
 viewGameOption : Game -> Html Msg
 viewGameOption game =
     option [ disabled game.disabled, value game.name ] []
@@ -52,8 +72,8 @@ viewGameOption game =
 
 viewDraws : List Draw -> Html Msg
 viewDraws draws =
-    Keyed.node "div"
-        []
+    Keyed.node "tbody"
+        [ class "draws" ]
         (List.map viewKeyedDraw draws)
 
 
@@ -64,8 +84,8 @@ viewKeyedDraw draw =
 
 viewDraw : Draw -> Html Msg
 viewDraw draw =
-    Keyed.node "div"
-        [ class "d-flex justify-content-between" ]
+    Keyed.node "tr"
+        [ class "draw" ]
         (List.map (viewKeyedDrawSheet draw) draw.drawSheets)
 
 
@@ -76,10 +96,12 @@ viewKeyedDrawSheet draw drawSheet =
 
 viewDrawSheet : Draw -> DrawSheet -> Html Msg
 viewDrawSheet draw drawSheet =
-    input
-        [ class "m-1 p-1"
-        , list "games"
-        , onInput (SelectedItem draw drawSheet)
-        , value drawSheet.value
+    td [ class "draw-sheet p-2" ]
+        [ input
+            [ class "form-control"
+            , list "games"
+            , onInput (SelectedItem draw drawSheet)
+            , value drawSheet.value
+            ]
+            []
         ]
-        []
