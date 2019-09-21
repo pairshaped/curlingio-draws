@@ -217,29 +217,6 @@
           }
         ]
       }
-    , { "id": 4
-      , "label": "4"
-      , "starts_at": null
-      , "attendance": null
-      , "draw_sheets":
-        [ { "sheet": 0
-          , "game_id": null
-          , "value": ""
-          }
-        , { "sheet": 1
-          , "game_id": null
-          , "value": ""
-          }
-        , { "sheet": 2
-          , "game_id": null
-          , "value": ""
-          }
-        , { "sheet": 3
-          , "game_id": null
-          , "value": ""
-          }
-        ]
-      }
     ]
   }
 }
