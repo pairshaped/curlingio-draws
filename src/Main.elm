@@ -58,7 +58,7 @@ update msg model =
             let
                 updatedDrawSheet drawSheet =
                     if drawSheet.sheet == onDrawSheet.sheet then
-                        { drawSheet | value = value }
+                        { drawSheet | value = value, changed = True }
 
                     else
                         drawSheet
@@ -90,7 +90,7 @@ update msg model =
             let
                 updatedDraw draw =
                     if draw.id == onDraw.id then
-                        { draw | label = Just newLabel }
+                        { draw | label = Just newLabel, labelChanged = True }
 
                     else
                         draw
@@ -112,7 +112,7 @@ update msg model =
             let
                 updatedDraw draw =
                     if draw.id == onDraw.id then
-                        { draw | startsAt = Just newStartsAt }
+                        { draw | startsAt = Just newStartsAt, startsAtChanged = True }
 
                     else
                         draw
@@ -136,7 +136,7 @@ update msg model =
                     if draw.id == onDraw.id then
                         case String.toInt newAttendance of
                             Just attendance ->
-                                { draw | attendance = Just attendance }
+                                { draw | attendance = Just attendance, attendanceChanged = True }
 
                             Nothing ->
                                 draw

@@ -91,21 +91,22 @@ viewDraw draw =
 viewDrawLabel : Draw -> Html Msg
 viewDrawLabel draw =
     td
-        [ class
-            ("draw_label p-1"
-                ++ (case draw.labelChanged of
-                        True ->
-                            " bg-warning"
-
-                        False ->
-                            ""
-                   )
-            )
+        [ class "draw_label p-1"
         , style "min-width" "70px"
         , style "max-width" "120px"
         ]
         [ input
             [ class "form-control"
+            , style "border"
+                ("1px solid "
+                    ++ (case draw.labelChanged of
+                            True ->
+                                "#ffc107"
+
+                            False ->
+                                "#ced4da"
+                       )
+                )
             , onInput (UpdateDrawLabel draw)
             , value
                 (case draw.label of
@@ -123,21 +124,22 @@ viewDrawLabel draw =
 viewStartsAt : Draw -> Html Msg
 viewStartsAt draw =
     td
-        [ class
-            ("draw_starts-at p-1"
-                ++ (case draw.startsAtChanged of
-                        True ->
-                            " bg-warning"
-
-                        False ->
-                            ""
-                   )
-            )
+        [ class "draw_starts-at p-1"
         , style "min-width" "275px"
         , style "max-width" "275px"
         ]
         [ input
             [ class "form-control"
+            , style "border"
+                ("1px solid "
+                    ++ (case draw.startsAtChanged of
+                            True ->
+                                "#ffc107"
+
+                            False ->
+                                "#ced4da"
+                       )
+                )
             , onInput (UpdateDrawStartsAt draw)
             , type_ "datetime-local"
             , value
@@ -156,21 +158,22 @@ viewStartsAt draw =
 viewDrawSheet : Draw -> DrawSheet -> Html Msg
 viewDrawSheet draw drawSheet =
     td
-        [ class
-            ("draw_sheet p-1"
-                ++ (case drawSheet.changed of
-                        True ->
-                            " bg-info"
-
-                        False ->
-                            ""
-                   )
-            )
+        [ class "draw_sheet p-1"
         , style "min-width" "120px"
         , style "max-width" "180px"
         ]
         [ input
             [ class "form-control"
+            , style "border"
+                ("1px solid "
+                    ++ (case drawSheet.changed of
+                            True ->
+                                "#ffc107"
+
+                            False ->
+                                "#ced4da"
+                       )
+                )
             , list "games"
             , onInput (SelectedItem draw drawSheet)
             , value drawSheet.value
@@ -182,21 +185,22 @@ viewDrawSheet draw drawSheet =
 viewAttendance : Draw -> Html Msg
 viewAttendance draw =
     td
-        [ class
-            ("draw_attendance p-1"
-                ++ (case draw.attendanceChanged of
-                        True ->
-                            " bg-warning"
-
-                        False ->
-                            ""
-                   )
-            )
+        [ class "draw_attendance p-1"
         , style "min-width" "70px"
         , style "max-width" "120px"
         ]
         [ input
             [ class "form-control"
+            , style "border"
+                ("1px solid "
+                    ++ (case draw.attendanceChanged of
+                            True ->
+                                "#ffc107"
+
+                            False ->
+                                "#ced4da"
+                       )
+                )
             , type_ "number"
             , onInput (UpdateDrawAttendance draw)
             , value
