@@ -83,7 +83,7 @@ gameDecoder =
         |> required "id" int
         |> required "name" string
         |> required "teams" teamsDecoder
-        |> required "disabled" bool
+        |> hardcoded False
 
 
 teamsDecoder : Decoder ( Int, Int )
@@ -109,5 +109,5 @@ drawSheetDecoder =
     Decode.succeed DrawSheet
         |> required "sheet" int
         |> required "game_id" (nullable int)
-        |> required "value" string
+        |> optional "value" string ""
         |> hardcoded False

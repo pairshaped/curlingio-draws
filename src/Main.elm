@@ -31,7 +31,10 @@ update msg model =
         GotData result ->
             case result of
                 Ok data ->
-                    ( { model | data = Success data }, Cmd.none )
+                    ( { model | data = Success data }
+                        |> updateGames
+                    , Cmd.none
+                    )
 
                 Err err ->
                     let
