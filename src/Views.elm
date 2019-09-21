@@ -218,6 +218,11 @@ viewAttendance draw =
 
 viewFooter : Html Msg
 viewFooter =
-    div [ class "ml-1" ]
-        [ button [ class "btn btn-primary", onClick AddDraw ] [ text "Add Draw" ]
+    div [ class "footer row" ]
+        [ div
+            [ class "col" ]
+            [ button [ class "btn btn-primary", onClick AddDraw ] [ text "Add Draw" ] ]
+        , div
+            [ class "col text-right" ]
+            [ button [ class "btn btn-secondary ml-1", onClick UndoChanges ] [ text "Undo Changes" ] ]
         ]

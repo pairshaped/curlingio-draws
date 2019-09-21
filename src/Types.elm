@@ -9,6 +9,7 @@ type Msg
     = GotData (Result Http.Error Data)
     | SaveData
     | AddDraw
+    | UndoChanges
     | SelectedItem Draw DrawSheet String
     | UpdateDrawLabel Draw String
     | UpdateDrawStartsAt Draw String

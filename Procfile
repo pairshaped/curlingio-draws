@@ -1,2 +1,2 @@
-server: json-server --watch data.json
+server: json-server --watch data.json --delay 300
 client: elm-live src/Main.elm --start-page=index.html --open -- --output=elm.js
