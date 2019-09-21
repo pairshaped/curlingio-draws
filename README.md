@@ -32,6 +32,6 @@ yarn start
 - [ ] Implement save / serilization
 - [ ] Hide attendance for events that don't need to track it.
 - [ ] Prevent a team from playing more than once in the same draw.
-- [ ] Highlight fields that have changed since last save.
+- [x] Highlight fields that have changed since last save.
 - [ ] Implement a reset to undo changes since last save. (re-fetch JSON)
 - [ ] Draw Schedule generation / regeneration based on games, dates, sheets, exclusions, etc.

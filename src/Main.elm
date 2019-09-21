@@ -160,7 +160,7 @@ update msg model =
         AddDraw ->
             let
                 newDrawSheet idx sheet =
-                    DrawSheet idx Nothing ""
+                    DrawSheet idx Nothing "" True
 
                 updatedDraws sheets draws =
                     let
@@ -170,7 +170,7 @@ update msg model =
                         nextLabel =
                             Just (String.fromInt (List.length draws + 1))
                     in
-                    draws ++ [ Draw nextId nextLabel Nothing Nothing (List.indexedMap newDrawSheet sheets) ]
+                    draws ++ [ Draw nextId nextLabel True Nothing True Nothing True (List.indexedMap newDrawSheet sheets) ]
 
                 updatedData =
                     case model.data of

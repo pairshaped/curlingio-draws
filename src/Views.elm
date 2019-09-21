@@ -91,7 +91,19 @@ viewDraw draw =
 viewDrawLabel : Draw -> Html Msg
 viewDrawLabel draw =
     td
-        [ class "draw_label p-1", style "min-width" "70px", style "max-width" "120px" ]
+        [ class
+            ("draw_label p-1"
+                ++ (case draw.labelChanged of
+                        True ->
+                            " bg-warning"
+
+                        False ->
+                            ""
+                   )
+            )
+        , style "min-width" "70px"
+        , style "max-width" "120px"
+        ]
         [ input
             [ class "form-control"
             , onInput (UpdateDrawLabel draw)
@@ -111,7 +123,19 @@ viewDrawLabel draw =
 viewStartsAt : Draw -> Html Msg
 viewStartsAt draw =
     td
-        [ class "draw_starts-at p-1", style "min-width" "275px", style "max-width" "275px" ]
+        [ class
+            ("draw_starts-at p-1"
+                ++ (case draw.startsAtChanged of
+                        True ->
+                            " bg-warning"
+
+                        False ->
+                            ""
+                   )
+            )
+        , style "min-width" "275px"
+        , style "max-width" "275px"
+        ]
         [ input
             [ class "form-control"
             , onInput (UpdateDrawStartsAt draw)
@@ -132,7 +156,19 @@ viewStartsAt draw =
 viewDrawSheet : Draw -> DrawSheet -> Html Msg
 viewDrawSheet draw drawSheet =
     td
-        [ class "draw_sheet p-1", style "min-width" "120px", style "max-width" "180px" ]
+        [ class
+            ("draw_sheet p-1"
+                ++ (case drawSheet.changed of
+                        True ->
+                            " bg-info"
+
+                        False ->
+                            ""
+                   )
+            )
+        , style "min-width" "120px"
+        , style "max-width" "180px"
+        ]
         [ input
             [ class "form-control"
             , list "games"
@@ -146,7 +182,19 @@ viewDrawSheet draw drawSheet =
 viewAttendance : Draw -> Html Msg
 viewAttendance draw =
     td
-        [ class "draw_attendance p-1", style "min-width" "70px", style "max-width" "120px" ]
+        [ class
+            ("draw_attendance p-1"
+                ++ (case draw.attendanceChanged of
+                        True ->
+                            " bg-warning"
+
+                        False ->
+                            ""
+                   )
+            )
+        , style "min-width" "70px"
+        , style "max-width" "120px"
+        ]
         [ input
             [ class "form-control"
             , type_ "number"

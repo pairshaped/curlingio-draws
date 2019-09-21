@@ -1,7 +1,8 @@
 module Types exposing (..)
 
 import Http
-import Json.Decode exposing (Decoder, bool, field, index, int, list, map2, map3, map4, map5, maybe, string)
+import Json.Decode as Decode exposing (Decoder, bool, index, int, list, map2, nullable, string)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
 
 type Msg
@@ -50,8 +51,11 @@ type alias Game =
 type alias Draw =
     { id : Maybe Int
     , label : Maybe String
+    , labelChanged : Bool
     , startsAt : Maybe String
+    , startsAtChanged : Bool
     , attendance : Maybe Int
+    , attendanceChanged : Bool
     , drawSheets : List DrawSheet
     }
 
@@ -60,24 +64,25 @@ type alias DrawSheet =
     { sheet : Int
     , gameId : Maybe Int
     , value : String
+    , changed : Bool
     }
 
 
 dataDecoder : Decoder Data
 dataDecoder =
-    map3 Data
-        (field "sheets" (list string))
-        (field "games" (list gameDecoder))
-        (field "draws" (list drawDecoder))
+    Decode.succeed Data
+        |> required "sheets" (list string)
+        |> required "games" (list gameDecoder)
+        |> required "draws" (list drawDecoder)
 
 
 gameDecoder : Decoder Game
 gameDecoder =
-    map4 Game
-        (field "id" int)
-        (field "name" string)
-        (field "teams" teamsDecoder)
-        (field "disabled" bool)
+    Decode.succeed Game
+        |> required "id" int
+        |> required "name" string
+        |> required "teams" teamsDecoder
+        |> required "disabled" bool
 
 
 teamsDecoder : Decoder ( Int, Int )
@@ -87,17 +92,21 @@ teamsDecoder =
 
 drawDecoder : Decoder Draw
 drawDecoder =
-    map5 Draw
-        (maybe (field "id" int))
-        (maybe (field "label" string))
-        (maybe (field "starts_at" string))
-        (maybe (field "attendance" int))
-        (field "draw_sheets" (list drawSheetDecoder))
+    Decode.succeed Draw
+        |> required "id" (nullable int)
+        |> required "label" (nullable string)
+        |> hardcoded False
+        |> required "starts_at" (nullable string)
+        |> hardcoded False
+        |> required "attendance" (nullable int)
+        |> hardcoded False
+        |> required "draw_sheets" (list drawSheetDecoder)
 
 
 drawSheetDecoder : Decoder DrawSheet
 drawSheetDecoder =
-    map3 DrawSheet
-        (field "sheet" int)
-        (maybe (field "game_id" int))
-        (field "value" string)
+    Decode.succeed DrawSheet
+        |> required "sheet" int
+        |> required "game_id" (nullable int)
+        |> required "value" string
+        |> hardcoded False
