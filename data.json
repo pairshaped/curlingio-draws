@@ -1,5 +1,6 @@
 { "data" :
-  { "sheets" :
+  { "has_attendance" : false
+  , "sheets" :
     [ "Sheet A"
     , "Sheet B"
     , "Sheet C"

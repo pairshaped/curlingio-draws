@@ -55,17 +55,31 @@ viewDrawsContainer data =
         [ class "table-responsive" ]
         [ table
             [ class "draws-container table table-sm table-borderless table-striped" ]
-            [ viewSheets data.sheets
-            , viewDraws data.draws
+            [ viewSheets data
+            , viewDraws data
             ]
         ]
 
 
-viewSheets : List String -> Html Msg
-viewSheets sheets =
+viewSheets : Data -> Html Msg
+viewSheets data =
+    let
+        addAttendance list =
+            if data.hasAttendance then
+                list ++ [ "Attend" ]
+
+            else
+                list
+    in
     thead []
         [ tr []
-            (List.map viewSheet ((sheets |> (::) "Starts at" |> (::) "Label") ++ [ "Attend" ]))
+            (List.map viewSheet
+                (data.sheets
+                    |> (::) "Starts at"
+                    |> (::) "Label"
+                    |> addAttendance
+                )
+            )
         ]
 
 
@@ -74,18 +88,31 @@ viewSheet sheet =
     th [ class "pl-2 pb-2" ] [ text sheet ]
 
 
-viewDraws : List Draw -> Html Msg
-viewDraws draws =
+viewDraws : Data -> Html Msg
+viewDraws data =
     tbody
         [ class "draws" ]
-        (List.map viewDraw draws)
+        (List.map (viewDraw data.hasAttendance) data.draws)
 
 
-viewDraw : Draw -> Html Msg
-viewDraw draw =
+viewDraw : Bool -> Draw -> Html Msg
+viewDraw hasAttendance draw =
+    let
+        addAttendance list =
+            if hasAttendance then
+                list ++ [ viewAttendance draw ]
+
+            else
+                list
+    in
     tr
         [ class "draw" ]
-        ((List.map (viewDrawSheet draw) draw.drawSheets |> (::) (viewStartsAt draw) |> (::) (viewDrawLabel draw)) ++ [ viewAttendance draw ])
+        (List.map (viewDrawSheet draw)
+            draw.drawSheets
+            |> (::) (viewStartsAt draw)
+            |> (::) (viewDrawLabel draw)
+            |> addAttendance
+        )
 
 
 viewDrawLabel : Draw -> Html Msg

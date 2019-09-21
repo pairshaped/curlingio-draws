@@ -26,13 +26,13 @@ yarn start
 ## TODO
 
 - [x] Highlight fields that have changed since last save.
-- [ ] Implement a reset to undo changes since last save. (re-fetch JSON)
+- [x] Implement a reset to undo changes since last save. (re-fetch JSON)
+- [x] Hide attendance for events that don't need to track it.
 - [ ] User Elm CSS instead of inline styles.
+- [ ] Implement save / serilization
+- [ ] Highlight a draw sheet input in red if a game was assigned that would result it a team playing more than once in the same draw.
 - [ ] Swap Draw ID for Draw Position / Index. ID will be a reference to the backing server / database.
 - [ ] Look into using an Array instead of a List for draws
 - [ ] Look into using an Array instead of a List for draw sheets
 - [ ] Potential helper method for decoding data in the update
-- [ ] Implement save / serilization
-- [ ] Hide attendance for events that don't need to track it.
-- [ ] Prevent a team from playing more than once in the same draw.
 - [ ] Draw Schedule generation / regeneration based on games, dates, sheets, exclusions, etc.

@@ -35,7 +35,8 @@ type alias Model =
 
 
 type alias Data =
-    { sheets : List String
+    { hasAttendance : Bool
+    , sheets : List String
     , games : List Game
     , draws : List Draw
     }
@@ -72,6 +73,7 @@ type alias DrawSheet =
 dataDecoder : Decoder Data
 dataDecoder =
     Decode.succeed Data
+        |> optional "has_attendance" bool False
         |> required "sheets" (list string)
         |> required "games" (list gameDecoder)
         |> required "draws" (list drawDecoder)
