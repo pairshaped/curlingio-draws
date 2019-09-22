@@ -3,6 +3,7 @@ module Views exposing (view)
 import Html exposing (Html, button, datalist, div, input, option, p, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, disabled, id, list, name, style, type_, value)
 import Html.Events exposing (onClick, onInput)
+import Styles exposing (..)
 import Types exposing (..)
 
 
