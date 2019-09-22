@@ -10,21 +10,28 @@ view : Model -> Html Msg
 view model =
     case model.data of
         NotAsked ->
-            text "Initializing..."
+            viewNotReady "Initializing..."
 
         Loading ->
-            text "Loading..."
+            viewNotReady "Loading..."
 
         Failure message ->
-            text message
+            viewNotReady message
 
         Success data ->
             viewData data
 
 
+viewNotReady : String -> Html Msg
+viewNotReady message =
+    div
+        [ class "container mt-3" ]
+        [ text message ]
+
+
 viewData : Data -> Html Msg
 viewData data =
-    div [ class "container" ]
+    div [ class "container mt-3" ]
         [ viewHeader
         , datalist [ id "games" ] (List.map viewGameOption data.games)
         , viewDrawsContainer data
@@ -34,7 +41,7 @@ viewData data =
 
 viewHeader : Html Msg
 viewHeader =
-    div [ class "row mt-4 mb-4" ]
+    div [ class "row mb-4" ]
         [ div [ class "col-8" ] [ text "Instructions" ]
         , div [ class "col-4" ]
             [ div [ class "text-right" ]
