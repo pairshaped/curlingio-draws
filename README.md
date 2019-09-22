@@ -28,7 +28,6 @@ yarn start
 - [x] Highlight fields that have changed since last save.
 - [x] Implement a reset to undo changes since last save. (re-fetch JSON)
 - [x] Hide attendance for events that don't need to track it.
-- [ ] User Elm CSS instead of inline styles.
 - [ ] Implement save / serilization
 - [ ] Highlight a draw sheet input in red if a game was assigned that would result it a team playing more than once in the same draw.
 - [ ] Swap Draw ID for Draw Position / Index. ID will be a reference to the backing server / database.

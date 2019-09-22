@@ -7,13 +7,13 @@ import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
 type Msg
     = GotData (Result Http.Error Data)
-    | SaveData
-    | AddDraw
     | RevertAllChanges
-    | SelectedItem Draw DrawSheet String
     | UpdateDrawLabel Draw String
     | UpdateDrawStartsAt Draw String
     | UpdateDrawAttendance Draw String
+    | SelectedGame Draw DrawSheet String
+    | AddDraw
+    | Validate
 
 
 type alias Flags =
@@ -67,6 +67,7 @@ type alias DrawSheet =
     , gameId : Maybe Int
     , value : String
     , changed : Bool
+    , problem : Bool
     }
 
 
@@ -112,4 +113,5 @@ drawSheetDecoder =
         |> required "sheet" int
         |> required "game_id" (nullable int)
         |> optional "value" string ""
+        |> hardcoded False
         |> hardcoded False

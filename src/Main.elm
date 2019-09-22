@@ -60,38 +60,6 @@ update msg model =
         RevertAllChanges ->
             ( { model | data = Loading }, getData model.flags.url )
 
-        SelectedItem onDraw onDrawSheet value ->
-            let
-                updatedDrawSheet drawSheet =
-                    if drawSheet.sheet == onDrawSheet.sheet then
-                        { drawSheet | value = value, changed = True }
-
-                    else
-                        drawSheet
-
-                updatedDrawSheets draw =
-                    if draw.id == onDraw.id then
-                        { draw | drawSheets = List.map updatedDrawSheet draw.drawSheets }
-
-                    else
-                        draw
-
-                updatedDraws draws =
-                    List.map updatedDrawSheets draws
-
-                updatedData =
-                    case model.data of
-                        Success decodedData ->
-                            Success { decodedData | draws = updatedDraws decodedData.draws }
-
-                        _ ->
-                            model.data
-            in
-            ( { model | data = updatedData }
-                |> updateGames
-            , Cmd.none
-            )
-
         UpdateDrawLabel onDraw newLabel ->
             let
                 updatedDraw draw =
@@ -163,10 +131,42 @@ update msg model =
             in
             ( { model | data = updatedData }, Cmd.none )
 
+        SelectedGame onDraw onDrawSheet value ->
+            let
+                updatedDrawSheet drawSheets drawSheet =
+                    if drawSheet.sheet == onDrawSheet.sheet then
+                        { drawSheet | gameId = Nothing, value = value, changed = True, problem = False }
+
+                    else
+                        drawSheet
+
+                updatedDrawSheets draw =
+                    if draw.id == onDraw.id then
+                        { draw | drawSheets = List.map (updatedDrawSheet draw.drawSheets) draw.drawSheets }
+
+                    else
+                        draw
+
+                updatedDraws draws =
+                    List.map updatedDrawSheets draws
+
+                updatedData =
+                    case model.data of
+                        Success decodedData ->
+                            Success { decodedData | draws = updatedDraws decodedData.draws }
+
+                        _ ->
+                            model.data
+            in
+            ( { model | data = updatedData }
+                |> updateGames
+            , Cmd.none
+            )
+
         AddDraw ->
             let
                 newDrawSheet idx sheet =
-                    DrawSheet idx Nothing "" True
+                    DrawSheet idx Nothing "" True False
 
                 updatedDraws sheets draws =
                     let
@@ -188,18 +188,22 @@ update msg model =
             in
             ( { model | data = updatedData }, Cmd.none )
 
-        SaveData ->
+        Validate ->
             let
-                updatedDrawSheet games drawSheet =
+                updatedDrawSheet games draw drawSheet =
                     case List.Extra.find (.name >> (==) drawSheet.value) games of
                         Just game ->
-                            { drawSheet | gameId = Just game.id }
+                            if teamsAlreadyAssignedInDraw game draw games then
+                                { drawSheet | gameId = Nothing, problem = True }
+
+                            else
+                                { drawSheet | gameId = Just game.id, problem = False }
 
                         Nothing ->
-                            { drawSheet | gameId = Nothing, value = "" }
+                            { drawSheet | gameId = Nothing, value = "", problem = False }
 
                 updatedDraw games draw =
-                    { draw | drawSheets = List.map (updatedDrawSheet games) draw.drawSheets }
+                    { draw | drawSheets = List.map (updatedDrawSheet games draw) draw.drawSheets }
 
                 updatedDraws games draws =
                     List.map (updatedDraw games) draws
@@ -258,6 +262,41 @@ getData url =
         { url = url
         , expect = Http.expectJson GotData dataDecoder
         }
+
+
+teamsAlreadyAssignedInDraw : Game -> Draw -> List Game -> Bool
+teamsAlreadyAssignedInDraw onGame draw games =
+    let
+        gameInDraw : Game -> Bool
+        gameInDraw game =
+            List.any
+                (\ds ->
+                    case ds.gameId of
+                        Just id ->
+                            id /= onGame.id && id == game.id
+
+                        Nothing ->
+                            False
+                )
+                draw.drawSheets
+
+        otherDrawGames : List Game
+        otherDrawGames =
+            List.filter (\g -> gameInDraw g) games
+
+        teamsInDraw : List Int
+        teamsInDraw =
+            let
+                topTeams =
+                    List.map (\g -> Tuple.first g.teams) otherDrawGames
+
+                bottomTeams =
+                    List.map (\g -> Tuple.second g.teams) otherDrawGames
+            in
+            List.append topTeams bottomTeams
+    in
+    List.member (Tuple.first onGame.teams) teamsInDraw
+        || List.member (Tuple.second onGame.teams) teamsInDraw
 
 
 

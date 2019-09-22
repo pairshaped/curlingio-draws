@@ -45,7 +45,7 @@ viewHeader =
         [ div [ class "col-8" ] [ text "Instructions" ]
         , div [ class "col-4" ]
             [ div [ class "text-right" ]
-                [ button [ class "btn btn-primary", onClick SaveData ] [ text "Save" ]
+                [ button [ class "btn btn-primary", onClick Validate ] [ text "Validate" ]
                 ]
             ]
         ]
@@ -133,12 +133,11 @@ viewDrawLabel draw =
             [ class "form-control"
             , style "border"
                 ("1px solid "
-                    ++ (case draw.labelChanged of
-                            True ->
-                                "#ffc107"
+                    ++ (if draw.labelChanged then
+                            "#ffc107"
 
-                            False ->
-                                "#ced4da"
+                        else
+                            "#ced4da"
                        )
                 )
             , onInput (UpdateDrawLabel draw)
@@ -166,12 +165,11 @@ viewStartsAt draw =
             [ class "form-control"
             , style "border"
                 ("1px solid "
-                    ++ (case draw.startsAtChanged of
-                            True ->
-                                "#ffc107"
+                    ++ (if draw.startsAtChanged then
+                            "#ffc107"
 
-                            False ->
-                                "#ced4da"
+                        else
+                            "#ced4da"
                        )
                 )
             , onInput (UpdateDrawStartsAt draw)
@@ -200,16 +198,18 @@ viewDrawSheet draw drawSheet =
             [ class "form-control"
             , style "border"
                 ("1px solid "
-                    ++ (case drawSheet.changed of
-                            True ->
-                                "#ffc107"
+                    ++ (if drawSheet.problem then
+                            "#ff0000"
 
-                            False ->
-                                "#ced4da"
+                        else if drawSheet.changed then
+                            "#ffc107"
+
+                        else
+                            "#ced4da"
                        )
                 )
             , list "games"
-            , onInput (SelectedItem draw drawSheet)
+            , onInput (SelectedGame draw drawSheet)
             , value drawSheet.value
             ]
             []
@@ -227,12 +227,11 @@ viewAttendance draw =
             [ class "form-control"
             , style "border"
                 ("1px solid "
-                    ++ (case draw.attendanceChanged of
-                            True ->
-                                "#ffc107"
+                    ++ (if draw.attendanceChanged then
+                            "#ffc107"
 
-                            False ->
-                                "#ced4da"
+                        else
+                            "#ced4da"
                        )
                 )
             , type_ "number"
@@ -255,7 +254,7 @@ viewFooter =
     div [ class "footer row" ]
         [ div
             [ class "col" ]
-            [ button [ class "btn btn-primary", onClick AddDraw ] [ text "Add Draw" ] ]
+            [ button [ class "btn btn-primary", onClick AddDraw ] [ text "Add draw" ] ]
         , div
             [ class "col text-right" ]
             [ button [ class "btn btn-secondary ml-1", onClick RevertAllChanges ] [ text "Revert all changes" ] ]
