@@ -57,7 +57,7 @@ update msg model =
                     in
                     ( { model | data = Failure errorMessage }, Cmd.none )
 
-        UndoChanges ->
+        RevertAllChanges ->
             ( { model | data = Loading }, getData model.flags.url )
 
         SelectedItem onDraw onDrawSheet value ->
