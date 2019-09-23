@@ -14,6 +14,7 @@ type Msg
     | SelectedGame Draw DrawSheet String
     | AddDraw
     | Validate
+    | Save
 
 
 type alias Flags =
@@ -31,6 +32,8 @@ type RemoteData
 type alias Model =
     { flags : Flags
     , data : RemoteData
+    , changed : Bool
+    , validated : Bool
     }
 
 

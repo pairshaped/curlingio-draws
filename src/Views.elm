@@ -19,7 +19,7 @@ view model =
             viewNotReady message
 
         Success data ->
-            viewData data
+            viewData model data
 
 
 viewNotReady : String -> Html Msg
@@ -29,23 +29,31 @@ viewNotReady message =
         [ text message ]
 
 
-viewData : Data -> Html Msg
-viewData data =
+viewData : Model -> Data -> Html Msg
+viewData model data =
     div [ class "container mt-3" ]
-        [ viewHeader
+        [ viewHeader model
         , datalist [ id "games" ] (List.map viewGameOption data.games)
         , viewDrawsContainer data
         , viewFooter
         ]
 
 
-viewHeader : Html Msg
-viewHeader =
+viewHeader : Model -> Html Msg
+viewHeader model =
     div [ class "row mb-4" ]
         [ div [ class "col-8" ] [ text "Instructions" ]
         , div [ class "col-4" ]
             [ div [ class "text-right" ]
-                [ button [ class "btn btn-primary", onClick Validate ] [ text "Validate" ]
+                [ if model.changed then
+                    if model.validated then
+                        button [ class "btn btn-primary", onClick Save ] [ text "Save" ]
+
+                    else
+                        button [ class "btn btn-primary", onClick Validate ] [ text "Validate" ]
+
+                  else
+                    text ""
                 ]
             ]
         ]

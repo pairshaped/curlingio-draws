@@ -18,7 +18,7 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( Model flags NotAsked, getData flags.url )
+    ( Model flags NotAsked False True, getData flags.url )
 
 
 
@@ -55,10 +55,10 @@ update msg model =
                                 Http.BadBody string ->
                                     "Bad body response from server when trying to fetch data: " ++ string
                     in
-                    ( { model | data = Failure errorMessage }, Cmd.none )
+                    ( { model | data = Failure errorMessage, changed = False, validated = True }, Cmd.none )
 
         RevertAllChanges ->
-            ( { model | data = Loading }, getData model.flags.url )
+            ( { model | data = Loading, changed = False, validated = True }, getData model.flags.url )
 
         UpdateDrawLabel onDraw newLabel ->
             let
@@ -80,7 +80,7 @@ update msg model =
                         _ ->
                             model.data
             in
-            ( { model | data = updatedData }, Cmd.none )
+            ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
 
         UpdateDrawStartsAt onDraw newStartsAt ->
             let
@@ -102,7 +102,7 @@ update msg model =
                         _ ->
                             model.data
             in
-            ( { model | data = updatedData }, Cmd.none )
+            ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
 
         UpdateDrawAttendance onDraw newAttendance ->
             let
@@ -129,7 +129,7 @@ update msg model =
                         _ ->
                             model.data
             in
-            ( { model | data = updatedData }, Cmd.none )
+            ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
 
         SelectedGame onDraw onDrawSheet value ->
             let
@@ -158,7 +158,7 @@ update msg model =
                         _ ->
                             model.data
             in
-            ( { model | data = updatedData }
+            ( { model | data = updatedData, changed = True, validated = False }
                 |> updateGames
             , Cmd.none
             )
@@ -186,7 +186,7 @@ update msg model =
                         _ ->
                             model.data
             in
-            ( { model | data = updatedData }, Cmd.none )
+            ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
 
         Validate ->
             let
@@ -216,7 +216,13 @@ update msg model =
                         _ ->
                             model.data
             in
-            ( { model | data = updatedData }, Cmd.none )
+            ( { model | data = updatedData }
+                |> updateValidated
+            , Cmd.none
+            )
+
+        Save ->
+            ( model, Cmd.none )
 
 
 
@@ -297,6 +303,30 @@ teamsAlreadyAssignedInDraw onGame draw games =
     in
     List.member (Tuple.first onGame.teams) teamsInDraw
         || List.member (Tuple.second onGame.teams) teamsInDraw
+
+
+updateValidated : Model -> Model
+updateValidated model =
+    let
+        drawSheetIssue drawSheet =
+            drawSheet.problem
+
+        drawIssues draw =
+            List.any drawSheetIssue draw.drawSheets
+
+        dataIssues data =
+            List.any drawIssues data.draws
+
+        dataHasErrors =
+            case model.data of
+                Success decodedData ->
+                    dataIssues decodedData
+
+                _ ->
+                    False
+    in
+    -- TODO Check if any of the data has an issue flagged
+    { model | validated = not dataHasErrors }
 
 
 
