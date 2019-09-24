@@ -104,31 +104,31 @@ viewDraws : Data -> Html Msg
 viewDraws data =
     tbody
         [ class "draws" ]
-        (List.map (viewDraw data.hasAttendance) data.draws)
+        (List.indexedMap (viewDraw data.hasAttendance) data.draws)
 
 
-viewDraw : Bool -> Draw -> Html Msg
-viewDraw hasAttendance draw =
+viewDraw : Bool -> Int -> Draw -> Html Msg
+viewDraw hasAttendance index draw =
     let
         addAttendance list =
             if hasAttendance then
-                list ++ [ viewAttendance draw ]
+                list ++ [ viewAttendance index draw ]
 
             else
                 list
     in
     tr
         [ class "draw" ]
-        (List.map (viewDrawSheet draw)
+        (List.map (viewDrawSheet index)
             draw.drawSheets
-            |> (::) (viewStartsAt draw)
-            |> (::) (viewDrawLabel draw)
+            |> (::) (viewStartsAt index draw)
+            |> (::) (viewDrawLabel index draw)
             |> addAttendance
         )
 
 
-viewDrawLabel : Draw -> Html Msg
-viewDrawLabel draw =
+viewDrawLabel : Int -> Draw -> Html Msg
+viewDrawLabel index draw =
     td
         [ class "draw_label p-1"
         , style "min-width" "70px"
@@ -145,7 +145,7 @@ viewDrawLabel draw =
                             "#ced4da"
                        )
                 )
-            , onInput (UpdateDrawLabel draw)
+            , onInput (UpdateDrawLabel index)
             , value
                 (case draw.label of
                     Just label ->
@@ -159,8 +159,8 @@ viewDrawLabel draw =
         ]
 
 
-viewStartsAt : Draw -> Html Msg
-viewStartsAt draw =
+viewStartsAt : Int -> Draw -> Html Msg
+viewStartsAt index draw =
     td
         [ class "draw_starts-at p-1"
         , style "min-width" "275px"
@@ -177,7 +177,7 @@ viewStartsAt draw =
                             "#ced4da"
                        )
                 )
-            , onInput (UpdateDrawStartsAt draw)
+            , onInput (UpdateDrawStartsAt index)
             , type_ "datetime-local"
             , value
                 (case draw.startsAt of
@@ -192,8 +192,8 @@ viewStartsAt draw =
         ]
 
 
-viewDrawSheet : Draw -> DrawSheet -> Html Msg
-viewDrawSheet draw drawSheet =
+viewDrawSheet : Int -> DrawSheet -> Html Msg
+viewDrawSheet index drawSheet =
     td
         [ class "draw_sheet p-1"
         , style "min-width" "120px"
@@ -214,15 +214,15 @@ viewDrawSheet draw drawSheet =
                        )
                 )
             , list "games"
-            , onInput (SelectedGame draw drawSheet)
+            , onInput (SelectedGame index drawSheet)
             , value drawSheet.value
             ]
             []
         ]
 
 
-viewAttendance : Draw -> Html Msg
-viewAttendance draw =
+viewAttendance : Int -> Draw -> Html Msg
+viewAttendance index draw =
     td
         [ class "draw_attendance p-1"
         , style "min-width" "70px"
@@ -240,7 +240,7 @@ viewAttendance draw =
                        )
                 )
             , type_ "number"
-            , onInput (UpdateDrawAttendance draw)
+            , onInput (UpdateDrawAttendance index)
             , value
                 (case draw.attendance of
                     Just attendance ->

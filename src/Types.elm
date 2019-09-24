@@ -8,10 +8,10 @@ import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 type Msg
     = GotData (Result Http.Error Data)
     | RevertAllChanges
-    | UpdateDrawLabel Draw String
-    | UpdateDrawStartsAt Draw String
-    | UpdateDrawAttendance Draw String
-    | SelectedGame Draw DrawSheet String
+    | UpdateDrawLabel Int String
+    | UpdateDrawStartsAt Int String
+    | UpdateDrawAttendance Int String
+    | SelectedGame Int DrawSheet String
     | AddDraw
     | Validate
     | Save

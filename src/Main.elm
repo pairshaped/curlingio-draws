@@ -60,17 +60,17 @@ update msg model =
         RevertAllChanges ->
             ( { model | data = Loading, changed = False, validated = True }, getData model.flags.url )
 
-        UpdateDrawLabel onDraw newLabel ->
+        UpdateDrawLabel onIndex newLabel ->
             let
-                updatedDraw draw =
-                    if draw.id == onDraw.id then
+                updatedDraw index draw =
+                    if index == onIndex then
                         { draw | label = Just newLabel, labelChanged = True }
 
                     else
                         draw
 
                 updatedDraws draws =
-                    List.map updatedDraw draws
+                    List.indexedMap updatedDraw draws
 
                 updatedData =
                     case model.data of
@@ -82,17 +82,17 @@ update msg model =
             in
             ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
 
-        UpdateDrawStartsAt onDraw newStartsAt ->
+        UpdateDrawStartsAt onIndex newStartsAt ->
             let
-                updatedDraw draw =
-                    if draw.id == onDraw.id then
+                updatedDraw index draw =
+                    if index == onIndex then
                         { draw | startsAt = Just newStartsAt, startsAtChanged = True }
 
                     else
                         draw
 
                 updatedDraws draws =
-                    List.map updatedDraw draws
+                    List.indexedMap updatedDraw draws
 
                 updatedData =
                     case model.data of
@@ -104,10 +104,10 @@ update msg model =
             in
             ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
 
-        UpdateDrawAttendance onDraw newAttendance ->
+        UpdateDrawAttendance onIndex newAttendance ->
             let
-                updatedDraw draw =
-                    if draw.id == onDraw.id then
+                updatedDraw index draw =
+                    if index == onIndex then
                         case String.toInt newAttendance of
                             Just attendance ->
                                 { draw | attendance = Just attendance, attendanceChanged = True }
@@ -119,7 +119,7 @@ update msg model =
                         draw
 
                 updatedDraws draws =
-                    List.map updatedDraw draws
+                    List.indexedMap updatedDraw draws
 
                 updatedData =
                     case model.data of
@@ -131,7 +131,7 @@ update msg model =
             in
             ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
 
-        SelectedGame onDraw onDrawSheet value ->
+        SelectedGame onDrawIndex onDrawSheet value ->
             let
                 updatedDrawSheet drawSheets drawSheet =
                     if drawSheet.sheet == onDrawSheet.sheet then
@@ -140,15 +140,15 @@ update msg model =
                     else
                         drawSheet
 
-                updatedDrawSheets draw =
-                    if draw.id == onDraw.id then
+                updatedDrawSheets index draw =
+                    if index == onDrawIndex then
                         { draw | drawSheets = List.map (updatedDrawSheet draw.drawSheets) draw.drawSheets }
 
                     else
                         draw
 
                 updatedDraws draws =
-                    List.map updatedDrawSheets draws
+                    List.indexedMap updatedDrawSheets draws
 
                 updatedData =
                     case model.data of
@@ -170,13 +170,10 @@ update msg model =
 
                 updatedDraws sheets draws =
                     let
-                        nextId =
-                            Just (List.length draws + 1)
-
                         nextLabel =
                             Just (String.fromInt (List.length draws + 1))
                     in
-                    draws ++ [ Draw nextId nextLabel True Nothing True Nothing True (List.indexedMap newDrawSheet sheets) ]
+                    draws ++ [ Draw Nothing nextLabel True Nothing True Nothing True (List.indexedMap newDrawSheet sheets) ]
 
                 updatedData =
                     case model.data of
