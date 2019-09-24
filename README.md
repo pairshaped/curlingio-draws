@@ -32,9 +32,9 @@ yarn start
 - [x] Validate draw sheet input is game assigned that would not result it a team playing more than once in the same draw.
 - [x] Validate draw starts at isn't blank.
 - [ ] Validate draw starts at is a valid date/time.
-- [ ] Validate draw starts at is unique across all draws.
+- [x] Validate draw starts at is unique across all draws.
 - [x] Validate draw label isn't blank.
-- [ ] Validate draw label is unique across all draws.
+- [x] Validate draw label is unique across all draws.
 - [ ] Validate draw attendance is not a negative number.
 - [ ] Validate draw attendance is a reasonable number (not too high).
 - [ ] Implement save / serilization

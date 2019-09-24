@@ -257,5 +257,5 @@ viewFooter model =
             [ button [ class "btn btn-primary", onClick AddDraw ] [ text "Add draw" ] ]
         , div
             [ class "col text-right" ]
-            [ button [ class "btn btn-secondary ml-1", disabled (not model.changed), onClick RevertAllChanges ] [ text "Revert all changes" ] ]
+            [ button [ class "btn btn-secondary ml-1", disabled (not model.changed), onClick DiscardChanges ] [ text "Discard changes" ] ]
         ]

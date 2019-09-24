@@ -57,7 +57,7 @@ update msg model =
                     in
                     ( { model | data = Failure errorMessage, changed = False, validated = True }, Cmd.none )
 
-        RevertAllChanges ->
+        DiscardChanges ->
             ( { model | data = Loading, changed = False, validated = True }, getData model.flags.url )
 
         UpdateDrawLabel onIndex newLabel ->
@@ -303,15 +303,29 @@ getData url =
 
 drawLabelIsValid : List Draw -> String -> Bool
 drawLabelIsValid draws value =
-    -- TODO make sure the label value is unique across all other draws
-    value /= ""
+    not
+        (value
+            == ""
+            || List.any (\draw -> draw.label.value == value) draws
+        )
 
 
 drawStartsAtIsValid : List Draw -> String -> Bool
 drawStartsAtIsValid draws value =
     -- TODO make sure the startsAt value is a valid date/time
-    -- TODO make sure the startsAt value is unique across all other draws
-    value /= ""
+    not
+        (value
+            == ""
+            || List.any (\draw -> draw.startsAt.value == value) draws
+        )
+
+
+validateDrawSheetSelection : List Draw -> Int -> DrawSheet -> List Draw
+validateDrawSheetSelection draws drawIndex drawSheet =
+    -- TODO make sure the selected value corresponds to a game.
+    -- TODO make sure the game hasn't already been assigned.
+    -- TODO make sure the game doesn't include a team that's already playing in the draw
+    draws
 
 
 teamsAlreadyAssignedInDraw : Game -> Draw -> List Game -> Bool

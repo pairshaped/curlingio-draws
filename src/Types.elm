@@ -7,7 +7,7 @@ import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
 type Msg
     = GotData (Result Http.Error Data)
-    | RevertAllChanges
+    | DiscardChanges
     | UpdateDrawLabel Int String
     | UpdateDrawStartsAt Int String
     | UpdateDrawAttendance Int String
