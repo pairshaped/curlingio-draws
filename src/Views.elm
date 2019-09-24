@@ -35,7 +35,7 @@ viewData model data =
         [ viewHeader model
         , datalist [ id "games" ] (List.map viewGameOption data.games)
         , viewDrawsContainer data
-        , viewFooter
+        , viewFooter model
         ]
 
 
@@ -138,7 +138,10 @@ viewDrawLabel index draw =
             [ class "form-control"
             , style "border"
                 ("1px solid "
-                    ++ (if draw.labelChanged then
+                    ++ (if not draw.label.valid then
+                            "#ff0000"
+
+                        else if draw.label.changed then
                             "#ffc107"
 
                         else
@@ -147,9 +150,9 @@ viewDrawLabel index draw =
                 )
             , onInput (UpdateDrawLabel index)
             , value
-                (case draw.label of
-                    Just label ->
-                        label
+                (case draw.label.value of
+                    Just value ->
+                        value
 
                     Nothing ->
                         ""
@@ -170,7 +173,10 @@ viewStartsAt index draw =
             [ class "form-control"
             , style "border"
                 ("1px solid "
-                    ++ (if draw.startsAtChanged then
+                    ++ (if not draw.startsAt.valid then
+                            "#ff0000"
+
+                        else if draw.startsAt.changed then
                             "#ffc107"
 
                         else
@@ -180,9 +186,9 @@ viewStartsAt index draw =
             , onInput (UpdateDrawStartsAt index)
             , type_ "datetime-local"
             , value
-                (case draw.startsAt of
-                    Just startsAt ->
-                        startsAt
+                (case draw.startsAt.value of
+                    Just value ->
+                        value
 
                     Nothing ->
                         ""
@@ -203,7 +209,7 @@ viewDrawSheet index drawSheet =
             [ class "form-control"
             , style "border"
                 ("1px solid "
-                    ++ (if drawSheet.problem then
+                    ++ (if not drawSheet.valid then
                             "#ff0000"
 
                         else if drawSheet.changed then
@@ -232,7 +238,10 @@ viewAttendance index draw =
             [ class "form-control"
             , style "border"
                 ("1px solid "
-                    ++ (if draw.attendanceChanged then
+                    ++ (if not draw.attendance.valid then
+                            "#ff0000"
+
+                        else if draw.attendance.changed then
                             "#ffc107"
 
                         else
@@ -242,9 +251,9 @@ viewAttendance index draw =
             , type_ "number"
             , onInput (UpdateDrawAttendance index)
             , value
-                (case draw.attendance of
-                    Just attendance ->
-                        String.fromInt attendance
+                (case draw.attendance.value of
+                    Just value ->
+                        String.fromInt value
 
                     Nothing ->
                         ""
@@ -254,13 +263,13 @@ viewAttendance index draw =
         ]
 
 
-viewFooter : Html Msg
-viewFooter =
+viewFooter : Model -> Html Msg
+viewFooter model =
     div [ class "footer row" ]
         [ div
             [ class "col" ]
             [ button [ class "btn btn-primary", onClick AddDraw ] [ text "Add draw" ] ]
         , div
             [ class "col text-right" ]
-            [ button [ class "btn btn-secondary ml-1", onClick RevertAllChanges ] [ text "Revert all changes" ] ]
+            [ button [ class "btn btn-secondary ml-1", disabled (not model.changed), onClick RevertAllChanges ] [ text "Revert all changes" ] ]
         ]

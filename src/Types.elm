@@ -53,14 +53,32 @@ type alias Game =
     }
 
 
+type alias DrawLabel =
+    { value : Maybe String
+    , changed : Bool
+    , valid : Bool
+    }
+
+
+type alias DrawStartsAt =
+    { value : Maybe String
+    , changed : Bool
+    , valid : Bool
+    }
+
+
+type alias DrawAttendance =
+    { value : Maybe Int
+    , changed : Bool
+    , valid : Bool
+    }
+
+
 type alias Draw =
     { id : Maybe Int
-    , label : Maybe String
-    , labelChanged : Bool
-    , startsAt : Maybe String
-    , startsAtChanged : Bool
-    , attendance : Maybe Int
-    , attendanceChanged : Bool
+    , label : DrawLabel
+    , startsAt : DrawStartsAt
+    , attendance : DrawAttendance
     , drawSheets : List DrawSheet
     }
 
@@ -70,7 +88,7 @@ type alias DrawSheet =
     , gameId : Maybe Int
     , value : String
     , changed : Bool
-    , problem : Bool
+    , valid : Bool
     }
 
 
@@ -101,12 +119,9 @@ drawDecoder : Decoder Draw
 drawDecoder =
     Decode.succeed Draw
         |> required "id" (nullable int)
-        |> required "label" (nullable string)
-        |> hardcoded False
-        |> required "starts_at" (nullable string)
-        |> hardcoded False
-        |> required "attendance" (nullable int)
-        |> hardcoded False
+        |> required "label" (nullable string |> Decode.map (\val -> DrawLabel val False True))
+        |> required "starts_at" (nullable string |> Decode.map (\val -> DrawStartsAt val False True))
+        |> required "attendance" (nullable int |> Decode.map (\val -> DrawAttendance val False True))
         |> required "draw_sheets" (list drawSheetDecoder)
 
 
@@ -117,4 +132,4 @@ drawSheetDecoder =
         |> required "game_id" (nullable int)
         |> optional "value" string ""
         |> hardcoded False
-        |> hardcoded False
+        |> hardcoded True

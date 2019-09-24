@@ -27,11 +27,10 @@ yarn start
 
 - [x] Highlight fields that have changed since last save.
 - [x] Implement a reset to undo changes since last save. (re-fetch JSON)
-- [x] Hide attendance for events that don't need to track it.
-- [x] Highlight a draw sheet input in red if a game was assigned that would result it a team playing more than once in the same draw.
-- [ ] Swap Draw ID for Draw Position / Index. ID will be a reference to the backing server / database.
+- [x] Hide attendance for events that aren't tracking it.
+- [x] Highlight draw sheet input in red if a game was assigned that would result it a team playing more than once in the same draw.
+- [ ] Highlight draw label input in red if it doesn't have a value or it's a duplicate of another draw's label.
+- [ ] Highlight draw starts at input in red if it doesn't have a value or it's a duplicate of another draw's starts at.
+- [ ] Highlight attendance input in red if it's a negative or unreasonably high number.
 - [ ] Implement save / serilization
-- [ ] Look into using an Array instead of a List for draws
-- [ ] Look into using an Array instead of a List for draw sheets
-- [ ] Potential helper method for decoding data in the update
 - [ ] Draw Schedule generation / regeneration based on games, dates, sheets, exclusions, etc.
