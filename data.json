@@ -8,115 +8,115 @@
     ]
   , "games" :
     [ { "id": 1
-      , "name": "A vs B"
+      , "name": "A vs B (G1)"
       , "teams": [1, 2]
       }
     , { "id": 2
-      , "name": "C vs D"
+      , "name": "C vs D (G2)"
       , "teams": [3, 4]
       }
     , { "id": 3
-      , "name": "E vs F"
+      , "name": "E vs F (G3)"
       , "teams": [5, 6]
       }
     , { "id": 4
-      , "name": "G vs H"
+      , "name": "G vs H (G4)"
       , "teams": [7, 8]
       }
     , { "id": 5
-      , "name": "F vs H"
+      , "name": "F vs H (G5)"
       , "teams": [6, 8]
       }
     , { "id": 6
-      , "name": "A vs C"
+      , "name": "A vs C (G6)"
       , "teams": [1, 3]
       }
     , { "id": 7
-      , "name": "B vs D"
+      , "name": "B vs D (G7)"
       , "teams": [2, 4]
       }
     , { "id": 8
-      , "name": "E vs G"
+      , "name": "E vs G (G8)"
       , "teams": [5, 7]
       }
     , { "id": 9
-      , "name": "E vs H"
+      , "name": "E vs H (G9)"
       , "teams": [5, 8]
       }
     , { "id": 10
-      , "name": "F vs G"
+      , "name": "F vs G (G10)"
       , "teams": [6, 7]
       }
     , { "id": 11
-      , "name": "A vs D"
+      , "name": "A vs D (G11)"
       , "teams": [1, 4]
       }
     , { "id": 12
-      , "name": "B vs C"
+      , "name": "B vs C (G12)"
       , "teams": [2, 3]
       }
     , { "id": 13
-      , "name": "F vs A"
+      , "name": "F vs A (G13)"
       , "teams": [6, 1]
       }
     , { "id": 14
-      , "name": "G vs B"
+      , "name": "G vs B (G14)"
       , "teams": [7, 2]
       }
     , { "id": 15
-      , "name": "H vs D"
+      , "name": "H vs D (G15)"
       , "teams": [8, 4]
       }
     , { "id": 16
-      , "name": "E vs C"
+      , "name": "E vs C (G16)"
       , "teams": [5, 3]
       }
     , { "id": 17
-      , "name": "E vs D"
+      , "name": "E vs D (G17)"
       , "teams": [5, 4]
       }
     , { "id": 18
-      , "name": "F vs B"
+      , "name": "F vs B (G18)"
       , "teams": [6, 2]
       }
     , { "id": 19
-      , "name": "G vs A"
+      , "name": "G vs A (G19)"
       , "teams": [7, 1]
       }
     , { "id": 20
-      , "name": "H vs C"
+      , "name": "H vs C (G20)"
       , "teams": [8, 3]
       }
     , { "id": 21
-      , "name": "E vs B"
+      , "name": "E vs B (G21)"
       , "teams": [5, 2]
       }
     , { "id": 22
-      , "name": "F vs C"
+      , "name": "F vs C (G22)"
       , "teams": [6, 3]
       }
     , { "id": 23
-      , "name": "G vs D"
+      , "name": "G vs D (G23)"
       , "teams": [7, 4]
       }
     , { "id": 24
-      , "name": "H vs A"
+      , "name": "H vs A (G24)"
       , "teams": [8, 1]
       }
     , { "id": 25
-      , "name": "H vs B"
+      , "name": "H vs B (G25)"
       , "teams": [8, 2]
       }
     , { "id": 26
-      , "name": "E vs A"
+      , "name": "E vs A (G26)"
       , "teams": [5, 1]
       }
     , { "id": 27
-      , "name": "F vs D"
+      , "name": "F vs D (G27)"
       , "teams": [6, 4]
       }
     , { "id": 28
-      , "name": "G vs C"
+      , "name": "G vs C (G28)"
       , "teams": [7, 3]
       }
     ]
@@ -128,19 +128,19 @@
       , "draw_sheets":
         [ { "sheet": 0
           , "game_id": 1
-          , "value": "A vs B"
+          , "value": "A vs B (G1)"
           }
         , { "sheet": 1
           , "game_id": 2
-          , "value": "C vs D"
+          , "value": "C vs D (G2)"
           }
         , { "sheet": 2
           , "game_id": 3
-          , "value": "E vs F"
+          , "value": "E vs F (G3)"
           }
         , { "sheet": 3
           , "game_id": 4
-          , "value": "G vs H"
+          , "value": "G vs H (G4)"
           }
         ]
       }
@@ -151,19 +151,19 @@
       , "draw_sheets":
         [ { "sheet": 0
           , "game_id": 5
-          , "value": "F vs H"
+          , "value": "F vs H (G5)"
           }
         , { "sheet": 1
           , "game_id": 6
-          , "value": "A vs C"
+          , "value": "A vs C (G6)"
           }
         , { "sheet": 2
           , "game_id": 7
-          , "value": "B vs D"
+          , "value": "B vs D (G7)"
           }
         , { "sheet": 3
           , "game_id": 8
-          , "value": "E vs G"
+          , "value": "E vs G (G8)"
           }
         ]
       }
@@ -174,19 +174,19 @@
       , "draw_sheets":
         [ { "sheet": 0
           , "game_id": 9
-          , "value": "E vs H"
+          , "value": "E vs H (G9)"
           }
         , { "sheet": 1
           , "game_id": 10
-          , "value": "F vs G"
+          , "value": "F vs G (G10)"
           }
         , { "sheet": 2
           , "game_id": 11
-          , "value": "A vs D"
+          , "value": "A vs D (G11)"
           }
         , { "sheet": 3
           , "game_id": 12
-          , "value": "B vs C"
+          , "value": "B vs C (G12)"
           }
         ]
       }
