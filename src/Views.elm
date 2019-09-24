@@ -44,16 +44,13 @@ viewHeader model =
     div [ class "row mb-4" ]
         [ div [ class "col-8" ] [ text "Instructions" ]
         , div [ class "col-4" ]
-            [ div [ class "text-right" ]
-                [ if model.changed then
-                    if model.validated then
-                        button [ class "btn btn-primary", onClick Save ] [ text "Save" ]
-
-                    else
-                        button [ class "btn btn-primary", onClick Validate ] [ text "Validate" ]
+            [ div
+                [ class "text-right" ]
+                [ if model.validated then
+                    button [ class "btn btn-primary", disabled (not model.changed), onClick Save ] [ text "Save" ]
 
                   else
-                    text ""
+                    button [ class "btn btn-primary", disabled (not model.changed), onClick Validate ] [ text "Validate" ]
                 ]
             ]
         ]
