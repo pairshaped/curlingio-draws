@@ -113,7 +113,7 @@ update msg model =
         UpdateDrawAttendance onIndex newAttendance ->
             let
                 updatedDrawAttendance attendance =
-                    { attendance | value = String.toInt newAttendance, changed = True, valid = True }
+                    { attendance | value = String.toInt newAttendance, changed = True, valid = drawAttendanceIsValid newAttendance }
 
                 updatedDraw index draw =
                     if index == onIndex then
@@ -128,7 +128,11 @@ update msg model =
                 updatedData =
                     case model.data of
                         Success decodedData ->
-                            Success { decodedData | draws = updatedDraws decodedData.draws }
+                            if decodedData.hasAttendance then
+                                Success { decodedData | draws = updatedDraws decodedData.draws }
+
+                            else
+                                model.data
 
                         _ ->
                             model.data
@@ -312,12 +316,28 @@ drawLabelIsValid draws value =
 
 drawStartsAtIsValid : List Draw -> String -> Bool
 drawStartsAtIsValid draws value =
-    -- TODO make sure the startsAt value is a valid date/time
     not
         (value
             == ""
             || List.any (\draw -> draw.startsAt.value == value) draws
         )
+
+
+drawAttendanceIsValid : String -> Bool
+drawAttendanceIsValid value =
+    (value == "")
+        || (case String.toInt value of
+                Just int ->
+                    int < 100000 && int >= 0
+
+                Nothing ->
+                    False
+           )
+
+
+drawSheetIsValid : Data -> String -> Bool
+drawSheetIsValid data value =
+    True
 
 
 validateDrawSheetSelection : List Draw -> Int -> DrawSheet -> List Draw

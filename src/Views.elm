@@ -1,7 +1,7 @@
 module Views exposing (view)
 
 import Html exposing (Html, button, datalist, div, input, option, p, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class, disabled, id, list, name, style, type_, value)
+import Html.Attributes exposing (class, disabled, id, list, max, min, name, required, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Types exposing (..)
 
@@ -148,6 +148,7 @@ viewDrawLabel index draw =
                             "#ced4da"
                        )
                 )
+            , required True
             , onInput (UpdateDrawLabel index)
             , value draw.label.value
             ]
@@ -159,8 +160,8 @@ viewStartsAt : Int -> Draw -> Html Msg
 viewStartsAt index draw =
     td
         [ class "draw_starts-at p-1"
-        , style "min-width" "275px"
-        , style "max-width" "275px"
+        , style "min-width" "265px"
+        , style "max-width" "265px"
         ]
         [ input
             [ class "form-control"
@@ -178,6 +179,7 @@ viewStartsAt index draw =
                 )
             , onInput (UpdateDrawStartsAt index)
             , type_ "datetime-local"
+            , required True
             , value draw.startsAt.value
             ]
             []
@@ -235,6 +237,9 @@ viewAttendance index draw =
                        )
                 )
             , type_ "number"
+            , required True
+            , min "0"
+            , max "99999"
             , onInput (UpdateDrawAttendance index)
             , value
                 (case draw.attendance.value of
@@ -242,7 +247,7 @@ viewAttendance index draw =
                         String.fromInt value
 
                     Nothing ->
-                        ""
+                        "0"
                 )
             ]
             []
