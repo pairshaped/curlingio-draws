@@ -54,14 +54,14 @@ type alias Game =
 
 
 type alias DrawLabel =
-    { value : Maybe String
+    { value : String
     , changed : Bool
     , valid : Bool
     }
 
 
 type alias DrawStartsAt =
-    { value : Maybe String
+    { value : String
     , changed : Bool
     , valid : Bool
     }
@@ -119,8 +119,8 @@ drawDecoder : Decoder Draw
 drawDecoder =
     Decode.succeed Draw
         |> required "id" (nullable int)
-        |> required "label" (nullable string |> Decode.map (\val -> DrawLabel val False True))
-        |> required "starts_at" (nullable string |> Decode.map (\val -> DrawStartsAt val False True))
+        |> required "label" (string |> Decode.map (\val -> DrawLabel val False True))
+        |> required "starts_at" (string |> Decode.map (\val -> DrawStartsAt val False True))
         |> required "attendance" (nullable int |> Decode.map (\val -> DrawAttendance val False True))
         |> required "draw_sheets" (list drawSheetDecoder)
 

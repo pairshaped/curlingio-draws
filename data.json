@@ -123,7 +123,7 @@
   , "draws":
     [ { "id": 1
       , "label": "1"
-      , "starts_at": null
+      , "starts_at": "2020-01-01T19:00"
       , "attendance": null
       , "draw_sheets":
         [ { "sheet": 0
@@ -146,7 +146,7 @@
       }
     , { "id": 2
       , "label": "2"
-      , "starts_at": null
+      , "starts_at": "2020-01-08T19:00"
       , "attendance": null
       , "draw_sheets":
         [ { "sheet": 0
@@ -169,7 +169,7 @@
       }
     , { "id": 3
       , "label": "3"
-      , "starts_at": null
+      , "starts_at": "2020-01-15T19:00"
       , "attendance": null
       , "draw_sheets":
         [ { "sheet": 0

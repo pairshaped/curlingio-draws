@@ -62,18 +62,18 @@ update msg model =
 
         UpdateDrawLabel onIndex newLabel ->
             let
-                updatedDrawLabel label =
-                    { label | value = Just newLabel, changed = True }
+                updatedDrawLabel draws label =
+                    { label | value = newLabel, changed = True, valid = drawLabelIsValid draws newLabel }
 
-                updatedDraw index draw =
+                updatedDraw draws index draw =
                     if index == onIndex then
-                        { draw | label = updatedDrawLabel draw.label }
+                        { draw | label = updatedDrawLabel draws draw.label }
 
                     else
                         draw
 
                 updatedDraws draws =
-                    List.indexedMap updatedDraw draws
+                    List.indexedMap (updatedDraw draws) draws
 
                 updatedData =
                     case model.data of
@@ -87,18 +87,18 @@ update msg model =
 
         UpdateDrawStartsAt onIndex newStartsAt ->
             let
-                updatedDrawStartsAt startsAt =
-                    { startsAt | value = Just newStartsAt, changed = True }
+                updatedDrawStartsAt draws startsAt =
+                    { startsAt | value = newStartsAt, changed = True, valid = drawStartsAtIsValid draws newStartsAt }
 
-                updatedDraw index draw =
+                updatedDraw draws index draw =
                     if index == onIndex then
-                        { draw | startsAt = updatedDrawStartsAt draw.startsAt }
+                        { draw | startsAt = updatedDrawStartsAt draws draw.startsAt }
 
                     else
                         draw
 
                 updatedDraws draws =
-                    List.indexedMap updatedDraw draws
+                    List.indexedMap (updatedDraw draws) draws
 
                 updatedData =
                     case model.data of
@@ -113,7 +113,7 @@ update msg model =
         UpdateDrawAttendance onIndex newAttendance ->
             let
                 updatedDrawAttendance attendance =
-                    { attendance | value = String.toInt newAttendance, changed = True }
+                    { attendance | value = String.toInt newAttendance, changed = True, valid = True }
 
                 updatedDraw index draw =
                     if index == onIndex then
@@ -175,10 +175,10 @@ update msg model =
                 updatedDraws sheets draws =
                     let
                         nextLabel =
-                            DrawLabel (Just (String.fromInt (List.length draws + 1))) True True
+                            DrawLabel (String.fromInt (List.length draws + 1)) True True
 
                         nextStartsAt =
-                            DrawStartsAt Nothing True True
+                            DrawStartsAt "" True False
 
                         nextAttendance =
                             DrawAttendance Nothing True True
@@ -197,6 +197,26 @@ update msg model =
 
         Validate ->
             let
+                updatedLabel draws label =
+                    { label
+                        | valid =
+                            if label.value == "" then
+                                False
+
+                            else
+                                True
+                    }
+
+                updatedStartsAt draws startsAt =
+                    { startsAt
+                        | valid =
+                            if startsAt.value == "" then
+                                False
+
+                            else
+                                True
+                    }
+
                 updatedDrawSheet games draw drawSheet =
                     case List.Extra.find (.name >> (==) drawSheet.value) games of
                         Just game ->
@@ -209,11 +229,15 @@ update msg model =
                         Nothing ->
                             { drawSheet | gameId = Nothing, value = "", valid = True }
 
-                updatedDraw games draw =
-                    { draw | drawSheets = List.map (updatedDrawSheet games draw) draw.drawSheets }
+                updatedDraw draws games draw =
+                    { draw
+                        | drawSheets = List.map (updatedDrawSheet games draw) draw.drawSheets
+                        , label = updatedLabel draws draw.label
+                        , startsAt = updatedStartsAt draws draw.startsAt
+                    }
 
                 updatedDraws games draws =
-                    List.map (updatedDraw games) draws
+                    List.map (updatedDraw draws games) draws
 
                 updatedData =
                     case model.data of
@@ -277,6 +301,19 @@ getData url =
         }
 
 
+drawLabelIsValid : List Draw -> String -> Bool
+drawLabelIsValid draws value =
+    -- TODO make sure the label value is unique across all other draws
+    value /= ""
+
+
+drawStartsAtIsValid : List Draw -> String -> Bool
+drawStartsAtIsValid draws value =
+    -- TODO make sure the startsAt value is a valid date/time
+    -- TODO make sure the startsAt value is unique across all other draws
+    value /= ""
+
+
 teamsAlreadyAssignedInDraw : Game -> Draw -> List Game -> Bool
 teamsAlreadyAssignedInDraw onGame draw games =
     let
@@ -320,6 +357,9 @@ updateValidated model =
 
         drawValid draw =
             List.all drawSheetValid draw.drawSheets
+                && draw.label.valid
+                && draw.startsAt.valid
+                && draw.attendance.valid
 
         drawsValid data =
             List.all drawValid data.draws

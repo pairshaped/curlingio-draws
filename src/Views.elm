@@ -149,14 +149,7 @@ viewDrawLabel index draw =
                        )
                 )
             , onInput (UpdateDrawLabel index)
-            , value
-                (case draw.label.value of
-                    Just value ->
-                        value
-
-                    Nothing ->
-                        ""
-                )
+            , value draw.label.value
             ]
             []
         ]
@@ -185,14 +178,7 @@ viewStartsAt index draw =
                 )
             , onInput (UpdateDrawStartsAt index)
             , type_ "datetime-local"
-            , value
-                (case draw.startsAt.value of
-                    Just value ->
-                        value
-
-                    Nothing ->
-                        ""
-                )
+            , value draw.startsAt.value
             ]
             []
         ]

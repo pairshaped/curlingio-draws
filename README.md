@@ -28,10 +28,15 @@ yarn start
 - [x] Highlight fields that have changed since last save.
 - [x] Implement a reset to undo changes since last save. (re-fetch JSON)
 - [x] Hide attendance for events that aren't tracking it.
-- [x] Highlight draw sheet input in red if a game was assigned that would result it a team playing more than once in the same draw.
-- [ ] Highlight draw label input in red if it doesn't have a value or it's a duplicate of another draw's label.
-- [ ] Highlight draw starts at input in red if it doesn't have a value or it's a duplicate of another draw's starts at.
-- [ ] Highlight attendance input in red if it's a negative or unreasonably high number.
+- [x] Highlight draw label, starts at, sheet, attendance inputs if they aren't valid.
+- [x] Validate draw sheet input is game assigned that would not result it a team playing more than once in the same draw.
+- [x] Validate draw starts at isn't blank.
+- [ ] Validate draw starts at is a valid date/time.
+- [ ] Validate draw starts at is unique across all draws.
+- [x] Validate draw label isn't blank.
+- [ ] Validate draw label is unique across all draws.
+- [ ] Validate draw attendance is not a negative number.
+- [ ] Validate draw attendance is a reasonable number (not too high).
 - [ ] Implement save / serilization
 
 ## Roadmap Features
