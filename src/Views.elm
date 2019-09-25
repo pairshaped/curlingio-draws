@@ -262,13 +262,13 @@ viewAttendance index draw =
 viewDelete : Int -> Html Msg
 viewDelete index =
     td
-        [ class "draw_delete p-2"
-        , style "min-width" "80px"
-        , style "max-width" "80px"
+        [ class "draw_delete p-2 text-right"
+        , style "min-width" "40px"
+        , style "max-width" "40px"
         ]
         [ button
-            [ class "btn btn-sm btn-secondary", onClick (DeleteDraw index) ]
-            [ text "Delete" ]
+            [ class "btn btn-sm btn-danger", onClick (DeleteDraw index) ]
+            [ text "X" ]
         ]
 
 
