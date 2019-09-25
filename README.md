@@ -29,14 +29,13 @@ yarn start
 - [x] Implement a reset to undo changes since last save. (re-fetch JSON)
 - [x] Hide attendance for events that aren't tracking it.
 - [x] Highlight draw label, starts at, sheet, attendance inputs if they aren't valid.
-- [x] Validate draw sheet input is game assigned that would not result it a team playing more than once in the same draw.
 - [x] Validate draw starts at isn't blank.
 - [x] Validate draw starts at is unique across all draws.
 - [x] Validate draw label isn't blank.
 - [x] Validate draw label is unique across all draws.
 - [x] Validate draw attendance is not a negative number.
 - [x] Validate draw attendance is a reasonable number (not too high).
-- [ ] Validate draw sheets on change.
+- [ ] Validate draw sheet input is game assigned that would not result it a team playing more than once in the same draw.
 - [ ] Get rid of the validate button in favour of real time validation and a disabled save button.
 - [ ] Implement save / serilization
 

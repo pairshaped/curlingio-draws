@@ -142,27 +142,28 @@ update msg model =
 
         SelectedGame onDrawIndex onDrawSheet value ->
             let
-                updatedDrawSheet drawSheets drawSheet =
+                updatedDrawSheet data draw drawSheet =
                     if drawSheet.sheet == onDrawSheet.sheet then
-                        { drawSheet | gameId = Nothing, value = value, changed = True, valid = True }
+                        { drawSheet | value = value, changed = True }
 
                     else
                         drawSheet
 
-                updatedDrawSheets index draw =
+                updatedDrawSheets data index draw =
                     if index == onDrawIndex then
-                        { draw | drawSheets = List.map (updatedDrawSheet draw.drawSheets) draw.drawSheets }
+                        { draw | drawSheets = List.map (updatedDrawSheet data draw) draw.drawSheets }
+                            |> validateDrawSheets data
 
                     else
                         draw
 
-                updatedDraws draws =
-                    List.indexedMap updatedDrawSheets draws
+                updatedDraws data =
+                    List.indexedMap (updatedDrawSheets data) data.draws
 
                 updatedData =
                     case model.data of
                         Success decodedData ->
-                            Success { decodedData | draws = updatedDraws decodedData.draws }
+                            Success { decodedData | draws = updatedDraws decodedData }
 
                         _ ->
                             model.data
@@ -199,63 +200,6 @@ update msg model =
                             model.data
             in
             ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
-
-        Validate ->
-            let
-                updatedLabel draws label =
-                    { label
-                        | valid =
-                            if label.value == "" then
-                                False
-
-                            else
-                                True
-                    }
-
-                updatedStartsAt draws startsAt =
-                    { startsAt
-                        | valid =
-                            if startsAt.value == "" then
-                                False
-
-                            else
-                                True
-                    }
-
-                updatedDrawSheet data draw drawSheet =
-                    case List.head (List.filter (\game -> nameOfGame data.teams game == drawSheet.value) data.games) of
-                        Just game ->
-                            if teamsAlreadyAssignedInDraw game draw data.games then
-                                { drawSheet | gameId = Nothing, valid = False }
-
-                            else
-                                { drawSheet | gameId = Just game.id, valid = True }
-
-                        Nothing ->
-                            { drawSheet | gameId = Nothing, value = "", valid = True }
-
-                updatedDraw data draw =
-                    { draw
-                        | drawSheets = List.map (updatedDrawSheet data draw) draw.drawSheets
-                        , label = updatedLabel data.draws draw.label
-                        , startsAt = updatedStartsAt data.draws draw.startsAt
-                    }
-
-                updatedDraws data =
-                    List.map (updatedDraw data) data.draws
-
-                updatedData =
-                    case model.data of
-                        Success decodedData ->
-                            Success { decodedData | draws = updatedDraws decodedData }
-
-                        _ ->
-                            model.data
-            in
-            ( { model | data = updatedData }
-                |> updateValidated
-            , Cmd.none
-            )
 
         Save ->
             ( model, Cmd.none )

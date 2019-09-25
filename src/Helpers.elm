@@ -108,6 +108,34 @@ nameOfGame teams game =
         ++ ")"
 
 
+findGameByName : Data -> String -> Maybe Game
+findGameByName data name =
+    data.games
+        |> List.filter (\game -> nameOfGame data.teams game == name)
+        |> List.head
+
+
+validateDrawSheets : Data -> Draw -> Draw
+validateDrawSheets data draw =
+    let
+        validateDrawSheet drawSheet =
+            case findGameByName data drawSheet.value of
+                Just game ->
+                    { drawSheet | gameId = Just game.id, valid = not (teamsAlreadyAssignedInDraw game draw data.games) }
+
+                Nothing ->
+                    if drawSheet.value == "" then
+                        { drawSheet | gameId = Nothing, valid = True }
+
+                    else
+                        { drawSheet | gameId = Nothing, valid = False }
+
+        validatedDrawSheets =
+            List.map validateDrawSheet draw.drawSheets
+    in
+    { draw | drawSheets = validatedDrawSheets }
+
+
 teamsAlreadyAssignedInDraw : Game -> Draw -> List Game -> Bool
 teamsAlreadyAssignedInDraw onGame draw games =
     let
@@ -143,8 +171,8 @@ teamsAlreadyAssignedInDraw onGame draw games =
         || List.member (Tuple.second onGame.teamIds) teamsInDraw
 
 
-updateValidated : Model -> Model
-updateValidated model =
+validForSave : Model -> Bool
+validForSave model =
     let
         drawSheetValid drawSheet =
             drawSheet.valid
@@ -157,14 +185,10 @@ updateValidated model =
 
         drawsValid data =
             List.all drawValid data.draws
-
-        dataValid =
-            case model.data of
-                Success decodedData ->
-                    drawsValid decodedData
-
-                _ ->
-                    False
     in
-    -- TODO Check if any of the data has an issue flagged
-    { model | validated = dataValid }
+    case model.data of
+        Success decodedData ->
+            drawsValid decodedData
+
+        _ ->
+            False
