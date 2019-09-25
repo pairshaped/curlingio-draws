@@ -79,6 +79,9 @@ viewSheets data =
 
             else
                 list
+
+        addDelete list =
+            list ++ [ "" ]
     in
     thead []
         [ tr []
@@ -87,6 +90,7 @@ viewSheets data =
                     |> (::) "Starts at"
                     |> (::) "Label"
                     |> addAttendance
+                    |> addDelete
                 )
             )
         ]
@@ -113,6 +117,9 @@ viewDraw hasAttendance index draw =
 
             else
                 list
+
+        addDelete list =
+            list ++ [ viewDelete index ]
     in
     tr
         [ class "draw" ]
@@ -121,6 +128,7 @@ viewDraw hasAttendance index draw =
             |> (::) (viewStartsAt index draw)
             |> (::) (viewDrawLabel index draw)
             |> addAttendance
+            |> addDelete
         )
 
 
@@ -248,6 +256,19 @@ viewAttendance index draw =
                 )
             ]
             []
+        ]
+
+
+viewDelete : Int -> Html Msg
+viewDelete index =
+    td
+        [ class "draw_delete p-2"
+        , style "min-width" "80px"
+        , style "max-width" "80px"
+        ]
+        [ button
+            [ class "btn btn-sm btn-secondary", onClick (DeleteDraw index) ]
+            [ text "Delete" ]
         ]
 
 

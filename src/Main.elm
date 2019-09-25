@@ -1,5 +1,6 @@
 module Main exposing (..)
 
+import Array
 import Browser
 import Helpers exposing (..)
 import Http
@@ -200,6 +201,21 @@ update msg model =
                             model.data
             in
             ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
+
+        DeleteDraw index ->
+            let
+                updatedDraws draws =
+                    List.Extra.removeAt index draws
+
+                updatedData =
+                    case model.data of
+                        Success decodedData ->
+                            Success { decodedData | draws = updatedDraws decodedData.draws }
+
+                        _ ->
+                            model.data
+            in
+            ( { model | data = updatedData, changed = True }, Cmd.none )
 
         Save ->
             ( model, Cmd.none )

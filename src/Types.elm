@@ -13,6 +13,7 @@ type Msg
     | UpdateDrawAttendance Int String
     | SelectedGame Int DrawSheet String
     | AddDraw
+    | DeleteDraw Int
     | Save
 
 
