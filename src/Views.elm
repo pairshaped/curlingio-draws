@@ -1,5 +1,6 @@
 module Views exposing (view)
 
+import Helpers exposing (..)
 import Html exposing (Html, button, datalist, div, input, option, p, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, disabled, id, list, max, min, name, required, style, type_, value)
 import Html.Events exposing (onClick, onInput)
@@ -33,7 +34,7 @@ viewData : Model -> Data -> Html Msg
 viewData model data =
     div [ class "container mt-3" ]
         [ viewHeader model
-        , datalist [ id "games" ] (List.map viewGameOption data.games)
+        , datalist [ id "games" ] (List.map (viewGameOption data.teams) data.games)
         , viewDrawsContainer data
         , viewFooter model
         ]
@@ -56,9 +57,9 @@ viewHeader model =
         ]
 
 
-viewGameOption : Game -> Html Msg
-viewGameOption game =
-    option [ disabled game.disabled, value game.name ] []
+viewGameOption : List Team -> Game -> Html Msg
+viewGameOption teams game =
+    option [ disabled game.disabled, value (nameOfGame teams game) ] []
 
 
 viewDrawsContainer : Data -> Html Msg

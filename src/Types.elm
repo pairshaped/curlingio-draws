@@ -40,15 +40,21 @@ type alias Model =
 type alias Data =
     { hasAttendance : Bool
     , sheets : List String
+    , teams : List Team
     , games : List Game
     , draws : List Draw
     }
 
 
-type alias Game =
+type alias Team =
     { id : Int
     , name : String
-    , teams : ( Int, Int )
+    }
+
+
+type alias Game =
+    { id : Int
+    , teamIds : ( Int, Int )
     , disabled : Bool
     }
 
@@ -97,21 +103,28 @@ dataDecoder =
     Decode.succeed Data
         |> optional "has_attendance" bool False
         |> required "sheets" (list string)
+        |> required "teams" (list teamDecoder)
         |> required "games" (list gameDecoder)
         |> required "draws" (list drawDecoder)
+
+
+teamDecoder : Decoder Team
+teamDecoder =
+    Decode.succeed Team
+        |> required "id" int
+        |> required "name" string
 
 
 gameDecoder : Decoder Game
 gameDecoder =
     Decode.succeed Game
         |> required "id" int
-        |> required "name" string
-        |> required "teams" teamsDecoder
+        |> required "team_ids" teamIdsDecoder
         |> hardcoded False
 
 
-teamsDecoder : Decoder ( Int, Int )
-teamsDecoder =
+teamIdsDecoder : Decoder ( Int, Int )
+teamIdsDecoder =
     map2 Tuple.pair (index 0 int) (index 1 int)
 
 

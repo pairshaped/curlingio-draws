@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Browser
+import Helpers exposing (..)
 import Http
 import List.Extra
 import Types exposing (..)
@@ -221,10 +222,10 @@ update msg model =
                                 True
                     }
 
-                updatedDrawSheet games draw drawSheet =
-                    case List.Extra.find (.name >> (==) drawSheet.value) games of
+                updatedDrawSheet data draw drawSheet =
+                    case List.head (List.filter (\game -> nameOfGame data.teams game == drawSheet.value) data.games) of
                         Just game ->
-                            if teamsAlreadyAssignedInDraw game draw games then
+                            if teamsAlreadyAssignedInDraw game draw data.games then
                                 { drawSheet | gameId = Nothing, valid = False }
 
                             else
@@ -233,20 +234,20 @@ update msg model =
                         Nothing ->
                             { drawSheet | gameId = Nothing, value = "", valid = True }
 
-                updatedDraw draws games draw =
+                updatedDraw data draw =
                     { draw
-                        | drawSheets = List.map (updatedDrawSheet games draw) draw.drawSheets
-                        , label = updatedLabel draws draw.label
-                        , startsAt = updatedStartsAt draws draw.startsAt
+                        | drawSheets = List.map (updatedDrawSheet data draw) draw.drawSheets
+                        , label = updatedLabel data.draws draw.label
+                        , startsAt = updatedStartsAt data.draws draw.startsAt
                     }
 
-                updatedDraws games draws =
-                    List.map (updatedDraw draws games) draws
+                updatedDraws data =
+                    List.map (updatedDraw data) data.draws
 
                 updatedData =
                     case model.data of
                         Success decodedData ->
-                            Success { decodedData | draws = updatedDraws decodedData.games decodedData.draws }
+                            Success { decodedData | draws = updatedDraws decodedData }
 
                         _ ->
                             model.data
@@ -258,156 +259,6 @@ update msg model =
 
         Save ->
             ( model, Cmd.none )
-
-
-
--- HELPERS
-
-
-updateGames : Model -> Model
-updateGames model =
-    let
-        -- Loop through the games setting each to disabled if a matching drawSheet value is the same as it's name
-        gameIsSelectedInDraw game draw =
-            case List.Extra.find (.value >> (==) game.name) draw.drawSheets of
-                Just drawSheet ->
-                    True
-
-                Nothing ->
-                    False
-
-        gameIsSelected draws game =
-            List.map (gameIsSelectedInDraw game) draws
-                |> List.member True
-
-        updatedGame draws game =
-            { game | disabled = gameIsSelected draws game }
-
-        updatedGames games draws =
-            List.map (updatedGame draws) games
-
-        updatedData =
-            case model.data of
-                Success decodedData ->
-                    Success { decodedData | games = updatedGames decodedData.games decodedData.draws }
-
-                _ ->
-                    model.data
-    in
-    { model | data = updatedData }
-
-
-getData : String -> Cmd Msg
-getData url =
-    Http.get
-        { url = url
-        , expect = Http.expectJson GotData dataDecoder
-        }
-
-
-drawLabelIsValid : List Draw -> String -> Bool
-drawLabelIsValid draws value =
-    not
-        (value
-            == ""
-            || List.any (\draw -> draw.label.value == value) draws
-        )
-
-
-drawStartsAtIsValid : List Draw -> String -> Bool
-drawStartsAtIsValid draws value =
-    not
-        (value
-            == ""
-            || List.any (\draw -> draw.startsAt.value == value) draws
-        )
-
-
-drawAttendanceIsValid : String -> Bool
-drawAttendanceIsValid value =
-    (value == "")
-        || (case String.toInt value of
-                Just int ->
-                    int < 100000 && int >= 0
-
-                Nothing ->
-                    False
-           )
-
-
-drawSheetIsValid : Data -> String -> Bool
-drawSheetIsValid data value =
-    True
-
-
-validateDrawSheetSelection : List Draw -> Int -> DrawSheet -> List Draw
-validateDrawSheetSelection draws drawIndex drawSheet =
-    -- TODO make sure the selected value corresponds to a game.
-    -- TODO make sure the game hasn't already been assigned.
-    -- TODO make sure the game doesn't include a team that's already playing in the draw
-    draws
-
-
-teamsAlreadyAssignedInDraw : Game -> Draw -> List Game -> Bool
-teamsAlreadyAssignedInDraw onGame draw games =
-    let
-        gameInDraw : Game -> Bool
-        gameInDraw game =
-            List.any
-                (\ds ->
-                    case ds.gameId of
-                        Just id ->
-                            id /= onGame.id && id == game.id
-
-                        Nothing ->
-                            False
-                )
-                draw.drawSheets
-
-        otherDrawGames : List Game
-        otherDrawGames =
-            List.filter (\g -> gameInDraw g) games
-
-        teamsInDraw : List Int
-        teamsInDraw =
-            let
-                topTeams =
-                    List.map (\g -> Tuple.first g.teams) otherDrawGames
-
-                bottomTeams =
-                    List.map (\g -> Tuple.second g.teams) otherDrawGames
-            in
-            List.append topTeams bottomTeams
-    in
-    List.member (Tuple.first onGame.teams) teamsInDraw
-        || List.member (Tuple.second onGame.teams) teamsInDraw
-
-
-updateValidated : Model -> Model
-updateValidated model =
-    let
-        drawSheetValid drawSheet =
-            drawSheet.valid
-
-        drawValid draw =
-            List.all drawSheetValid draw.drawSheets
-                && draw.label.valid
-                && draw.startsAt.valid
-                && draw.attendance.valid
-
-        drawsValid data =
-            List.all drawValid data.draws
-
-        dataValid =
-            case model.data of
-                Success decodedData ->
-                    drawsValid decodedData
-
-                _ ->
-                    False
-    in
-    -- TODO Check if any of the data has an issue flagged
-    { model | validated = dataValid }
 
 
 
