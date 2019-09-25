@@ -36,7 +36,7 @@ yarn start
 - [x] Validate draw attendance is not a negative number.
 - [x] Validate draw attendance is a reasonable number (not too high).
 - [ ] Validate draw sheet input is game assigned that would not result it a team playing more than once in the same draw.
-- [ ] Get rid of the validate button in favour of real time validation and a disabled save button.
+- [ ] Draw deletion.
 - [ ] Implement save / serilization
 
 ## Roadmap Features
