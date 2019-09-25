@@ -35,7 +35,7 @@ yarn start
 - [x] Validate draw label is unique across all draws.
 - [x] Validate draw attendance is not a negative number.
 - [x] Validate draw attendance is a reasonable number (not too high).
-- [ ] Validate draw sheet input is game assigned that would not result it a team playing more than once in the same draw.
+- [x] Validate draw sheet input is game assigned that would not result it a team playing more than once in the same draw.
 - [ ] Draw deletion.
 - [ ] Implement save / serilization
 

@@ -144,7 +144,7 @@ update msg model =
             let
                 updatedDrawSheet data draw drawSheet =
                     if drawSheet.sheet == onDrawSheet.sheet then
-                        { drawSheet | value = value, changed = True }
+                        { drawSheet | value = value, gameId = Nothing, changed = True }
 
                     else
                         drawSheet
