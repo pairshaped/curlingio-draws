@@ -37,7 +37,9 @@ update msg model =
             )
 
         PatchedDraws draws ->
-            ( { model | savedDraws = draws }, Cmd.none )
+            ( { model | schedule = Loading, savedDraws = draws, changed = False }
+            , getSchedule model.flags.url
+            )
 
         DiscardChanges ->
             ( { model | schedule = Loading, changed = False, validated = True }, getSchedule model.flags.url )
@@ -199,7 +201,7 @@ update msg model =
 
         Save ->
             let
-                postDraws =
+                sendPatch =
                     case model.schedule of
                         Success decodedSchedule ->
                             patchDraws model.flags.url decodedSchedule.draws
@@ -207,7 +209,7 @@ update msg model =
                         _ ->
                             Cmd.none
             in
-            ( model, postDraws )
+            ( { model | savedDraws = Loading }, sendPatch )
 
 
 
