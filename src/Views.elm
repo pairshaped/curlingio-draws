@@ -80,7 +80,7 @@ viewHeader model =
 
 viewGameOption : List Team -> Game -> Html Msg
 viewGameOption teams game =
-    option [ disabled game.disabled, value (nameOfGame teams game) ] []
+    option [ disabled game.disabled, value game.name ] []
 
 
 viewDrawsContainer : Schedule -> Html Msg

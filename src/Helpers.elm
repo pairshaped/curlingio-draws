@@ -9,25 +9,20 @@ import Types exposing (..)
 populateDrawSheetValues : Model -> Model
 populateDrawSheetValues model =
     let
+        gameNameById id games =
+            case List.Extra.find (\game -> game.id == id) games of
+                Just game ->
+                    game.name
+
+                Nothing ->
+                    ""
+
         updatedDrawSheet schedule drawSheet =
             { drawSheet
                 | value =
-                    case
-                        List.Extra.find
-                            (\g ->
-                                g.id
-                                    == (case drawSheet.gameId of
-                                            Just id ->
-                                                id
-
-                                            Nothing ->
-                                                -1
-                                       )
-                            )
-                            schedule.games
-                    of
-                        Just game ->
-                            nameOfGame schedule.teams game
+                    case drawSheet.gameId of
+                        Just gameId ->
+                            gameNameById gameId schedule.games
 
                         Nothing ->
                             ""
@@ -54,24 +49,16 @@ updateGames : Model -> Model
 updateGames model =
     let
         -- Loop through the games setting each to disabled if a matching drawSheet value is the same as it's name
-        gameIsSelectedInDraw name game draw =
-            case List.Extra.find (\ds -> ds.value == name) draw.drawSheets of
+        gameIsSelectedInDraw game draw =
+            case List.Extra.find (\ds -> ds.value == game.name) draw.drawSheets of
                 Just drawSheet ->
                     True
 
                 Nothing ->
                     False
 
-        gameIsSelected name draws game =
-            List.map (gameIsSelectedInDraw name game) draws
-                |> List.member True
-
         updatedGame schedule game =
-            let
-                name =
-                    nameOfGame schedule.teams game
-            in
-            if gameIsSelected name schedule.draws game then
+            if List.any (gameIsSelectedInDraw game) schedule.draws then
                 { game | disabled = True }
 
             else
@@ -131,37 +118,14 @@ drawAttendanceIsValid value =
            )
 
 
-nameOfGame : List Team -> Game -> String
-nameOfGame teams game =
-    let
-        teamNameForId id =
-            case List.head (List.filter (\team -> team.id == id) teams) of
-                Just team ->
-                    team.name
-
-                Nothing ->
-                    "TBD"
-    in
-    teamNameForId (Tuple.first game.teamIds)
-        ++ " vs "
-        ++ teamNameForId (Tuple.second game.teamIds)
-        ++ " (G"
-        ++ String.fromInt game.id
-        ++ ")"
-
-
-findGameByName : Schedule -> String -> Maybe Game
-findGameByName schedule name =
-    schedule.games
-        |> List.filter (\game -> nameOfGame schedule.teams game == name)
-        |> List.head
-
-
 validateDrawSheets : Schedule -> Draw -> Draw
 validateDrawSheets schedule draw =
     let
+        findGameByName name =
+            List.Extra.find (\game -> game.name == name) schedule.games
+
         validateDrawSheet drawSheet =
-            case findGameByName schedule drawSheet.value of
+            case findGameByName drawSheet.value of
                 Just game ->
                     { drawSheet | gameId = Just game.id, valid = not (teamsAlreadyAssignedInDraw game draw schedule.games) }
 

@@ -44,20 +44,16 @@ update msg model =
         DiscardChanges ->
             ( { model | schedule = Loading, changed = False, validated = True }, getSchedule model.flags.url )
 
-        UpdateDrawLabel onIndex newLabel ->
+        UpdateDrawLabel index newLabel ->
             let
                 updatedDrawLabel draws label =
                     { label | value = newLabel, changed = True, valid = drawLabelIsValid draws newLabel }
 
-                updatedDraw draws index draw =
-                    if index == onIndex then
-                        { draw | label = updatedDrawLabel draws draw.label }
-
-                    else
-                        draw
+                updatedDraw draws draw =
+                    { draw | label = updatedDrawLabel draws draw.label }
 
                 updatedDraws draws =
-                    List.indexedMap (updatedDraw draws) draws
+                    List.Extra.updateAt index (\draw -> updatedDraw draws draw) draws
 
                 updatedSchedule =
                     case model.schedule of
@@ -69,20 +65,16 @@ update msg model =
             in
             ( { model | schedule = updatedSchedule, changed = True, validated = False }, Cmd.none )
 
-        UpdateDrawStartsAt onIndex newStartsAt ->
+        UpdateDrawStartsAt index newStartsAt ->
             let
                 updatedDrawStartsAt draws startsAt =
                     { startsAt | value = newStartsAt, changed = True, valid = drawStartsAtIsValid draws newStartsAt }
 
-                updatedDraw draws index draw =
-                    if index == onIndex then
-                        { draw | startsAt = updatedDrawStartsAt draws draw.startsAt }
-
-                    else
-                        draw
+                updatedDraw draws draw =
+                    { draw | startsAt = updatedDrawStartsAt draws draw.startsAt }
 
                 updatedDraws draws =
-                    List.indexedMap (updatedDraw draws) draws
+                    List.Extra.updateAt index (\draw -> updatedDraw draws draw) draws
 
                 updatedSchedule =
                     case model.schedule of
@@ -94,20 +86,16 @@ update msg model =
             in
             ( { model | schedule = updatedSchedule, changed = True, validated = False }, Cmd.none )
 
-        UpdateDrawAttendance onIndex newAttendance ->
+        UpdateDrawAttendance index newAttendance ->
             let
                 updatedDrawAttendance attendance =
                     { attendance | value = String.toInt newAttendance, changed = True, valid = drawAttendanceIsValid newAttendance }
 
-                updatedDraw index draw =
-                    if index == onIndex then
-                        { draw | attendance = updatedDrawAttendance draw.attendance }
-
-                    else
-                        draw
+                updatedDraw draw =
+                    { draw | attendance = updatedDrawAttendance draw.attendance }
 
                 updatedDraws draws =
-                    List.indexedMap updatedDraw draws
+                    List.Extra.updateAt index (\draw -> updatedDraw draw) draws
 
                 updatedSchedule =
                     case model.schedule of
@@ -123,7 +111,7 @@ update msg model =
             in
             ( { model | schedule = updatedSchedule, changed = True, validated = False }, Cmd.none )
 
-        SelectedGame onDrawIndex onDrawSheet value ->
+        SelectedGame index onDrawSheet value ->
             let
                 updatedDrawSheet draw drawSheet =
                     if drawSheet.sheet == onDrawSheet.sheet then
@@ -132,16 +120,12 @@ update msg model =
                     else
                         drawSheet
 
-                updatedDrawSheets schedule index draw =
-                    if index == onDrawIndex then
-                        { draw | drawSheets = List.map (updatedDrawSheet draw) draw.drawSheets }
-                            |> validateDrawSheets schedule
-
-                    else
-                        draw
+                updatedDraw schedule draw =
+                    { draw | drawSheets = List.map (updatedDrawSheet draw) draw.drawSheets }
+                        |> validateDrawSheets schedule
 
                 updatedDraws schedule =
-                    List.indexedMap (updatedDrawSheets schedule) schedule.draws
+                    List.Extra.updateAt index (\draw -> updatedDraw schedule draw) schedule.draws
 
                 updatedSchedule =
                     case model.schedule of
@@ -158,8 +142,8 @@ update msg model =
 
         AddDraw ->
             let
-                newDrawSheet idx sheet =
-                    DrawSheet idx Nothing "" True True
+                newDrawSheet index sheet =
+                    DrawSheet index Nothing "" True True
 
                 updatedDraws sheets draws =
                     let
