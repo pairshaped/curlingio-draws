@@ -21,7 +21,7 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( Model flags NotAsked False True NotAttempted, getSchedule flags.url )
+    ( Model flags NotAsked False True NotAsked, getSchedule flags.url )
 
 
 
@@ -31,63 +31,15 @@ init flags =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotSchedule result ->
-            case result of
-                Ok schedule ->
-                    ( { model | schedule = Success schedule }
-                        |> populateDrawSheetValues
-                        |> updateGames
-                    , Cmd.none
-                    )
+        GotSchedule schedule ->
+            ( { model | schedule = schedule }
+                |> populateDrawSheetValues
+                |> updateGames
+            , Cmd.none
+            )
 
-                Err err ->
-                    let
-                        errorMessage =
-                            case err of
-                                RemoteData.Http.BadUrl string ->
-                                    "Bad URL used to fetch schedule: " ++ string
-
-                                RemoteData.Http.Timeout ->
-                                    "Network timeout when trying to fetch schedule."
-
-                                RemoteData.Http.NetworkError ->
-                                    "Network error when trying to fetch schedule."
-
-                                RemoteData.Http.BadStatus int ->
-                                    "Bad status response from server when trying to fetch schedule."
-
-                                RemoteData.Http.BadBody string ->
-                                    "Bad body response from server when trying to fetch schedule: " ++ string
-                    in
-                    ( { model | schedule = Failure errorMessage, changed = False, validated = True }, Cmd.none )
-
-        PatchedDraws result ->
-            case result of
-                Ok savedDraws ->
-                    ( { model | savedDraws = SaveSuccess savedDraws, changed = False }
-                    , Cmd.none
-                    )
-
-                Err err ->
-                    let
-                        errorMessage =
-                            case err of
-                                RemoteData.Http.BadUrl string ->
-                                    "Bad URL used to save draws: " ++ string
-
-                                RemoteData.Http.Timeout ->
-                                    "Network timeout when trying to save draws."
-
-                                RemoteData.Http.NetworkError ->
-                                    "Network error when trying to save draws."
-
-                                RemoteData.Http.BadStatus int ->
-                                    "Bad status response from server when trying to save draws."
-
-                                RemoteData.Http.BadBody string ->
-                                    "Bad body response from server when trying to save draws: " ++ string
-                    in
-                    ( { model | savedDraws = SaveFailure errorMessage }, Cmd.none )
+        PatchedDraws draws ->
+            ( { model | savedDraws = draws }, Cmd.none )
 
         DiscardChanges ->
             ( { model | schedule = Loading, changed = False, validated = True }, getSchedule model.flags.url )
@@ -252,7 +204,7 @@ update msg model =
                 postDraws =
                     case model.schedule of
                         Success decodedSchedule ->
-                            saveDraws model.flags.url decodedSchedule.draws
+                            patchDraws model.flags.url decodedSchedule.draws
 
                         _ ->
                             Cmd.none

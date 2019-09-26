@@ -26,7 +26,7 @@ type alias Model =
     , schedule : WebData Schedule
     , changed : Bool
     , validated : Bool
-    , savedDraws : SavedDraws
+    , savedDraws : WebData SavedDraws
     }
 
 

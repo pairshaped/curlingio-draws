@@ -4,6 +4,9 @@ import Helpers exposing (..)
 import Html exposing (Html, button, datalist, div, input, option, p, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, disabled, id, list, max, min, name, required, style, type_, value)
 import Html.Events exposing (onClick, onInput)
+import Http
+import RemoteData exposing (RemoteData(..))
+import RemoteData.Http
 import Types exposing (..)
 
 
@@ -16,8 +19,26 @@ view model =
         Loading ->
             viewNotReady "Loading..."
 
-        Failure message ->
-            viewNotReady message
+        Failure error ->
+            let
+                errorMessage =
+                    case error of
+                        Http.BadUrl string ->
+                            "Bad URL used to fetch schedule: " ++ string
+
+                        Http.Timeout ->
+                            "Network timeout when trying to fetch schedule."
+
+                        Http.NetworkError ->
+                            "Network error when trying to fetch schedule."
+
+                        Http.BadStatus int ->
+                            "Bad status response from server when trying to fetch schedule."
+
+                        Http.BadBody string ->
+                            "Bad body response from server when trying to fetch schedule: " ++ string
+            in
+            viewNotReady errorMessage
 
         Success schedule ->
             viewSchedule model schedule
