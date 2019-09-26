@@ -1,317 +1,319 @@
 {
-  "settings": {
-    "has_attendance": true
-  },
-  "sheets": [
-    "Sheet A",
-    "Sheet B",
-    "Sheet C",
-    "Sheet D"
-  ],
-  "teams": [
-    {
-      "id": 1,
-      "name": "A"
+  "data" : {
+    "settings": {
+      "has_attendance": true
     },
-    {
-      "id": 2,
-      "name": "B"
-    },
-    {
-      "id": 3,
-      "name": "C"
-    },
-    {
-      "id": 4,
-      "name": "D"
-    },
-    {
-      "id": 5,
-      "name": "E"
-    },
-    {
-      "id": 6,
-      "name": "F"
-    },
-    {
-      "id": 7,
-      "name": "G"
-    },
-    {
-      "id": 8,
-      "name": "H"
-    }
-  ],
-  "games": [
-    {
-      "id": 1,
-      "team_ids": [
-        1,
-        2
-      ]
-    },
-    {
-      "id": 2,
-      "team_ids": [
-        3,
-        4
-      ]
-    },
-    {
-      "id": 3,
-      "team_ids": [
-        5,
-        6
-      ]
-    },
-    {
-      "id": 4,
-      "team_ids": [
-        7,
-        8
-      ]
-    },
-    {
-      "id": 5,
-      "team_ids": [
-        6,
-        8
-      ]
-    },
-    {
-      "id": 6,
-      "team_ids": [
-        1,
-        3
-      ]
-    },
-    {
-      "id": 7,
-      "team_ids": [
-        2,
-        4
-      ]
-    },
-    {
-      "id": 8,
-      "team_ids": [
-        5,
-        7
-      ]
-    },
-    {
-      "id": 9,
-      "team_ids": [
-        5,
-        8
-      ]
-    },
-    {
-      "id": 10,
-      "team_ids": [
-        6,
-        7
-      ]
-    },
-    {
-      "id": 11,
-      "team_ids": [
-        1,
-        4
-      ]
-    },
-    {
-      "id": 12,
-      "team_ids": [
-        2,
-        3
-      ]
-    },
-    {
-      "id": 13,
-      "team_ids": [
-        6,
-        1
-      ]
-    },
-    {
-      "id": 14,
-      "team_ids": [
-        7,
-        2
-      ]
-    },
-    {
-      "id": 15,
-      "team_ids": [
-        8,
-        4
-      ]
-    },
-    {
-      "id": 16,
-      "team_ids": [
-        5,
-        3
-      ]
-    },
-    {
-      "id": 17,
-      "team_ids": [
-        5,
-        4
-      ]
-    },
-    {
-      "id": 18,
-      "team_ids": [
-        6,
-        2
-      ]
-    },
-    {
-      "id": 19,
-      "team_ids": [
-        7,
-        1
-      ]
-    },
-    {
-      "id": 20,
-      "team_ids": [
-        8,
-        3
-      ]
-    },
-    {
-      "id": 21,
-      "team_ids": [
-        5,
-        2
-      ]
-    },
-    {
-      "id": 22,
-      "team_ids": [
-        6,
-        3
-      ]
-    },
-    {
-      "id": 23,
-      "team_ids": [
-        7,
-        4
-      ]
-    },
-    {
-      "id": 24,
-      "team_ids": [
-        8,
-        1
-      ]
-    },
-    {
-      "id": 25,
-      "team_ids": [
-        8,
-        2
-      ]
-    },
-    {
-      "id": 26,
-      "team_ids": [
-        5,
-        1
-      ]
-    },
-    {
-      "id": 27,
-      "team_ids": [
-        6,
-        4
-      ]
-    },
-    {
-      "id": 28,
-      "team_ids": [
-        7,
-        3
-      ]
-    }
-  ],
-  "draws": [
-    {
-      "id": 1,
-      "label": "1",
-      "starts_at": "2020-01-01T19:00",
-      "attendance": null,
-      "draw_sheets": [
-        {
-          "sheet": 0,
-          "game_id": 1
-        },
-        {
-          "sheet": 1,
-          "game_id": 2
-        },
-        {
-          "sheet": 2,
-          "game_id": 3
-        },
-        {
-          "sheet": 3,
-          "game_id": 4
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "label": "2",
-      "starts_at": "2020-01-08T19:00",
-      "attendance": null,
-      "draw_sheets": [
-        {
-          "sheet": 0,
-          "game_id": 5
-        },
-        {
-          "sheet": 1,
-          "game_id": 6
-        },
-        {
-          "sheet": 2,
-          "game_id": 7
-        },
-        {
-          "sheet": 3,
-          "game_id": 8
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "label": "3",
-      "starts_at": "2020-01-15T19:00",
-      "attendance": null,
-      "draw_sheets": [
-        {
-          "sheet": 0,
-          "game_id": 9
-        },
-        {
-          "sheet": 1,
-          "game_id": 10
-        },
-        {
-          "sheet": 2,
-          "game_id": 11
-        },
-        {
-          "sheet": 3,
-          "game_id": 12
-        }
-      ]
-    }
-  ]
+    "sheets": [
+      "Sheet A",
+      "Sheet B",
+      "Sheet C",
+      "Sheet D"
+    ],
+    "teams": [
+      {
+        "id": 1,
+        "name": "A"
+      },
+      {
+        "id": 2,
+        "name": "B"
+      },
+      {
+        "id": 3,
+        "name": "C"
+      },
+      {
+        "id": 4,
+        "name": "D"
+      },
+      {
+        "id": 5,
+        "name": "E"
+      },
+      {
+        "id": 6,
+        "name": "F"
+      },
+      {
+        "id": 7,
+        "name": "G"
+      },
+      {
+        "id": 8,
+        "name": "H"
+      }
+    ],
+    "games": [
+      {
+        "id": 1,
+        "team_ids": [
+          1,
+          2
+        ]
+      },
+      {
+        "id": 2,
+        "team_ids": [
+          3,
+          4
+        ]
+      },
+      {
+        "id": 3,
+        "team_ids": [
+          5,
+          6
+        ]
+      },
+      {
+        "id": 4,
+        "team_ids": [
+          7,
+          8
+        ]
+      },
+      {
+        "id": 5,
+        "team_ids": [
+          6,
+          8
+        ]
+      },
+      {
+        "id": 6,
+        "team_ids": [
+          1,
+          3
+        ]
+      },
+      {
+        "id": 7,
+        "team_ids": [
+          2,
+          4
+        ]
+      },
+      {
+        "id": 8,
+        "team_ids": [
+          5,
+          7
+        ]
+      },
+      {
+        "id": 9,
+        "team_ids": [
+          5,
+          8
+        ]
+      },
+      {
+        "id": 10,
+        "team_ids": [
+          6,
+          7
+        ]
+      },
+      {
+        "id": 11,
+        "team_ids": [
+          1,
+          4
+        ]
+      },
+      {
+        "id": 12,
+        "team_ids": [
+          2,
+          3
+        ]
+      },
+      {
+        "id": 13,
+        "team_ids": [
+          6,
+          1
+        ]
+      },
+      {
+        "id": 14,
+        "team_ids": [
+          7,
+          2
+        ]
+      },
+      {
+        "id": 15,
+        "team_ids": [
+          8,
+          4
+        ]
+      },
+      {
+        "id": 16,
+        "team_ids": [
+          5,
+          3
+        ]
+      },
+      {
+        "id": 17,
+        "team_ids": [
+          5,
+          4
+        ]
+      },
+      {
+        "id": 18,
+        "team_ids": [
+          6,
+          2
+        ]
+      },
+      {
+        "id": 19,
+        "team_ids": [
+          7,
+          1
+        ]
+      },
+      {
+        "id": 20,
+        "team_ids": [
+          8,
+          3
+        ]
+      },
+      {
+        "id": 21,
+        "team_ids": [
+          5,
+          2
+        ]
+      },
+      {
+        "id": 22,
+        "team_ids": [
+          6,
+          3
+        ]
+      },
+      {
+        "id": 23,
+        "team_ids": [
+          7,
+          4
+        ]
+      },
+      {
+        "id": 24,
+        "team_ids": [
+          8,
+          1
+        ]
+      },
+      {
+        "id": 25,
+        "team_ids": [
+          8,
+          2
+        ]
+      },
+      {
+        "id": 26,
+        "team_ids": [
+          5,
+          1
+        ]
+      },
+      {
+        "id": 27,
+        "team_ids": [
+          6,
+          4
+        ]
+      },
+      {
+        "id": 28,
+        "team_ids": [
+          7,
+          3
+        ]
+      }
+    ],
+    "draws": [
+      {
+        "id": 1,
+        "label": "1",
+        "starts_at": "2020-01-01T19:00",
+        "attendance": null,
+        "draw_sheets": [
+          {
+            "sheet": 0,
+            "game_id": 1
+          },
+          {
+            "sheet": 1,
+            "game_id": 2
+          },
+          {
+            "sheet": 2,
+            "game_id": 3
+          },
+          {
+            "sheet": 3,
+            "game_id": 4
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "label": "2",
+        "starts_at": "2020-01-08T19:00",
+        "attendance": null,
+        "draw_sheets": [
+          {
+            "sheet": 0,
+            "game_id": 5
+          },
+          {
+            "sheet": 1,
+            "game_id": 6
+          },
+          {
+            "sheet": 2,
+            "game_id": 7
+          },
+          {
+            "sheet": 3,
+            "game_id": 8
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "label": "3",
+        "starts_at": "2020-01-15T19:00",
+        "attendance": null,
+        "draw_sheets": [
+          {
+            "sheet": 0,
+            "game_id": 9
+          },
+          {
+            "sheet": 1,
+            "game_id": 10
+          },
+          {
+            "sheet": 2,
+            "game_id": 11
+          },
+          {
+            "sheet": 3,
+            "game_id": 12
+          }
+        ]
+      }
+    ]
+  }
 }
