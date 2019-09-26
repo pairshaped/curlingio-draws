@@ -1,7 +1,7 @@
 module Views exposing (view)
 
 import Helpers exposing (..)
-import Html exposing (Html, button, datalist, div, input, option, p, table, tbody, td, text, th, thead, tr)
+import Html exposing (Html, button, datalist, div, em, input, option, p, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, disabled, id, list, max, min, name, required, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Http
@@ -62,9 +62,14 @@ viewSchedule model schedule =
 
 viewHeader : Model -> Html Msg
 viewHeader model =
-    div [ class "row mb-4" ]
-        [ div [ class "col-8" ] [ text "Instructions" ]
-        , div [ class "col-4" ]
+    div [ class "mb-4 d-flex" ]
+        [ div
+            [ class "mr-3" ]
+            [ em
+                []
+                [ text "Select the games to be played in each draw. If an input is highlighted in red, it's invalid and needs to be fixed. If an input in highlighted in yellow, it's been modified but not yet saved." ]
+            ]
+        , div []
             [ div
                 [ class "text-right" ]
                 [ button [ class "btn btn-primary", disabled (not model.changed || not (validForSave model)), onClick Save ] [ text "Save" ]

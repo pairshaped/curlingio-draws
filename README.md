@@ -1,6 +1,6 @@
-# Description
+# Draw Schedule Editor for Curling I/O
 
-This is the draw sheet editor for Curling I/O.
+![Draw Schedule editor for Curling I/O](curlingio-draws.gif?raw=true "Draw Schedule editor for Curling I/O")
 
 ## Requirements:
 
@@ -46,3 +46,4 @@ Copyright &copy; 2019 Curling I/O using the [MIT License](https://opensource.org
 - [x] Validate draw sheet input is game assigned that would not result it a team playing more than once in the same draw.
 - [x] Draw deletion.
 - [x] Implement save / serilization
+- [ ] Copy the starts at from the previous draw (if there is one) when adding a new draw, just to have a decent starting point.
