@@ -245,7 +245,7 @@
       {
         "id": 1,
         "label": "1",
-        "starts_at": "2020-01-01T19:00",
+        "starts_at": "2019-09-01T19:00",
         "attendance": 200,
         "draw_sheets": [
           {
@@ -269,7 +269,7 @@
       {
         "id": 2,
         "label": "2",
-        "starts_at": "2020-01-08T19:00",
+        "starts_at": "2019-09-08T19:00",
         "attendance": 100,
         "draw_sheets": [
           {
@@ -293,7 +293,7 @@
       {
         "id": 3,
         "label": "3",
-        "starts_at": "2020-01-15T19:00",
+        "starts_at": "2019-09-15T19:00",
         "attendance": 120,
         "draw_sheets": [
           {
