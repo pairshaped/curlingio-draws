@@ -1,15 +1,16 @@
 module Helpers exposing (..)
 
-import Http
 import Json.Decode as Decode
 import List.Extra
+import RemoteData exposing (RemoteData(..), WebData)
+import RemoteData.Http
 import Types exposing (..)
 
 
 populateDrawSheetValues : Model -> Model
 populateDrawSheetValues model =
     let
-        updatedDrawSheet data drawSheet =
+        updatedDrawSheet schedule drawSheet =
             { drawSheet
                 | value =
                     case
@@ -24,30 +25,30 @@ populateDrawSheetValues model =
                                                 -1
                                        )
                             )
-                            data.games
+                            schedule.games
                     of
                         Just game ->
-                            nameOfGame data.teams game
+                            nameOfGame schedule.teams game
 
                         Nothing ->
                             ""
             }
 
-        updatedDraw data draw =
-            { draw | drawSheets = List.map (updatedDrawSheet data) draw.drawSheets }
+        updatedDraw schedule draw =
+            { draw | drawSheets = List.map (updatedDrawSheet schedule) draw.drawSheets }
 
-        updatedDraws data =
-            List.map (updatedDraw data) data.draws
+        updatedDraws schedule =
+            List.map (updatedDraw schedule) schedule.draws
 
-        updatedData =
-            case model.data of
-                Success decodedData ->
-                    Success { decodedData | draws = updatedDraws decodedData }
+        updatedSchedule =
+            case model.schedule of
+                Success decodedSchedule ->
+                    Success { decodedSchedule | draws = updatedDraws decodedSchedule }
 
                 _ ->
-                    model.data
+                    model.schedule
     in
-    { model | data = updatedData }
+    { model | schedule = updatedSchedule }
 
 
 updateGames : Model -> Model
@@ -66,54 +67,39 @@ updateGames model =
             List.map (gameIsSelectedInDraw name game) draws
                 |> List.member True
 
-        updatedGame data game =
+        updatedGame schedule game =
             let
                 name =
-                    nameOfGame data.teams game
+                    nameOfGame schedule.teams game
             in
-            if gameIsSelected name data.draws game then
+            if gameIsSelected name schedule.draws game then
                 { game | disabled = True }
 
             else
                 { game | disabled = False }
 
-        updatedGames data =
-            List.map (updatedGame data) data.games
+        updatedGames schedule =
+            List.map (updatedGame schedule) schedule.games
 
-        updatedData =
-            case model.data of
-                Success decodedData ->
-                    Success { decodedData | games = updatedGames decodedData }
+        updatedSchedule =
+            case model.schedule of
+                Success decodedSchedule ->
+                    Success { decodedSchedule | games = updatedGames decodedSchedule }
 
                 _ ->
-                    model.data
+                    model.schedule
     in
-    { model | data = updatedData }
+    { model | schedule = updatedSchedule }
 
 
-getData : String -> Cmd Msg
-getData url =
-    Http.get
-        { url = url
-        , expect = Http.expectJson GotData dataDecoder
-        }
+getSchedule : String -> Cmd Msg
+getSchedule url =
+    RemoteData.Http.get url GotSchedule scheduleDecoder
 
 
-saveDraws : String -> List Draw -> Cmd Msg
-saveDraws url draws =
-    let
-        body =
-            Http.jsonBody <| encodeDraws draws
-    in
-    Http.request
-        { method = "PATCH"
-        , headers = []
-        , url = url
-        , body = body
-        , expect = Http.expectJson Saved Decode.string
-        , timeout = Nothing
-        , tracker = Nothing
-        }
+patchDraws : String -> List Draw -> Cmd Msg
+patchDraws url draws =
+    RemoteData.Http.patch url PatchedDraws savedDrawsDecoder (encodeDraws draws)
 
 
 drawLabelIsValid : List Draw -> String -> Bool
@@ -146,8 +132,8 @@ drawAttendanceIsValid value =
            )
 
 
-drawSheetIsValid : Data -> String -> Bool
-drawSheetIsValid data value =
+drawSheetIsValid : Schedule -> String -> Bool
+drawSheetIsValid schedule value =
     True
 
 
@@ -178,20 +164,20 @@ nameOfGame teams game =
         ++ ")"
 
 
-findGameByName : Data -> String -> Maybe Game
-findGameByName data name =
-    data.games
-        |> List.filter (\game -> nameOfGame data.teams game == name)
+findGameByName : Schedule -> String -> Maybe Game
+findGameByName schedule name =
+    schedule.games
+        |> List.filter (\game -> nameOfGame schedule.teams game == name)
         |> List.head
 
 
-validateDrawSheets : Data -> Draw -> Draw
-validateDrawSheets data draw =
+validateDrawSheets : Schedule -> Draw -> Draw
+validateDrawSheets schedule draw =
     let
         validateDrawSheet drawSheet =
-            case findGameByName data drawSheet.value of
+            case findGameByName schedule drawSheet.value of
                 Just game ->
-                    { drawSheet | gameId = Just game.id, valid = not (teamsAlreadyAssignedInDraw game draw data.games) }
+                    { drawSheet | gameId = Just game.id, valid = not (teamsAlreadyAssignedInDraw game draw schedule.games) }
 
                 Nothing ->
                     if drawSheet.value == "" then
@@ -253,12 +239,12 @@ validForSave model =
                 && draw.startsAt.valid
                 && draw.attendance.valid
 
-        drawsValid data =
-            List.all drawValid data.draws
+        drawsValid schedule =
+            List.all drawValid schedule.draws
     in
-    case model.data of
-        Success decodedData ->
-            drawsValid decodedData
+    case model.schedule of
+        Success decodedSchedule ->
+            drawsValid decodedSchedule
 
         _ ->
             False

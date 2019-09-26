@@ -9,7 +9,7 @@ import Types exposing (..)
 
 view : Model -> Html Msg
 view model =
-    case model.data of
+    case model.schedule of
         NotAsked ->
             viewNotReady "Initializing..."
 
@@ -19,8 +19,8 @@ view model =
         Failure message ->
             viewNotReady message
 
-        Success data ->
-            viewData model data
+        Success schedule ->
+            viewSchedule model schedule
 
 
 viewNotReady : String -> Html Msg
@@ -30,12 +30,12 @@ viewNotReady message =
         [ text message ]
 
 
-viewData : Model -> Data -> Html Msg
-viewData model data =
+viewSchedule : Model -> Schedule -> Html Msg
+viewSchedule model schedule =
     div [ class "container mt-3" ]
         [ viewHeader model
-        , datalist [ id "games" ] (List.map (viewGameOption data.teams) data.games)
-        , viewDrawsContainer data
+        , datalist [ id "games" ] (List.map (viewGameOption schedule.teams) schedule.games)
+        , viewDrawsContainer schedule
         , viewFooter model
         ]
 
@@ -58,23 +58,23 @@ viewGameOption teams game =
     option [ disabled game.disabled, value (nameOfGame teams game) ] []
 
 
-viewDrawsContainer : Data -> Html Msg
-viewDrawsContainer data =
+viewDrawsContainer : Schedule -> Html Msg
+viewDrawsContainer schedule =
     div
         [ class "table-responsive" ]
         [ table
             [ class "draws-container table table-sm table-borderless table-striped" ]
-            [ viewSheets data
-            , viewDraws data
+            [ viewSheets schedule
+            , viewDraws schedule
             ]
         ]
 
 
-viewSheets : Data -> Html Msg
-viewSheets data =
+viewSheets : Schedule -> Html Msg
+viewSheets schedule =
     let
         addAttendance list =
-            if data.settings.hasAttendance then
+            if schedule.settings.hasAttendance then
                 list ++ [ "Attend" ]
 
             else
@@ -86,7 +86,7 @@ viewSheets data =
     thead []
         [ tr []
             (List.map viewSheet
-                (data.sheets
+                (schedule.sheets
                     |> (::) "Starts at"
                     |> (::) "Label"
                     |> addAttendance
@@ -101,11 +101,11 @@ viewSheet sheet =
     th [ class "pl-2 pb-2" ] [ text sheet ]
 
 
-viewDraws : Data -> Html Msg
-viewDraws data =
+viewDraws : Schedule -> Html Msg
+viewDraws schedule =
     tbody
         [ class "draws" ]
-        (List.indexedMap (viewDraw data.settings.hasAttendance) data.draws)
+        (List.indexedMap (viewDraw schedule.settings.hasAttendance) schedule.draws)
 
 
 viewDraw : Bool -> Int -> Draw -> Html Msg

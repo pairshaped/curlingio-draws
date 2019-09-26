@@ -3,8 +3,9 @@ module Main exposing (..)
 import Array
 import Browser
 import Helpers exposing (..)
-import Http
 import List.Extra
+import RemoteData exposing (RemoteData(..), WebData)
+import RemoteData.Http
 import Types exposing (..)
 import Views exposing (view)
 
@@ -20,7 +21,7 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( Model flags NotAsked False True NotAttempted, getData flags.url )
+    ( Model flags NotAsked False True NotAttempted, getSchedule flags.url )
 
 
 
@@ -30,10 +31,10 @@ init flags =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotData result ->
+        GotSchedule result ->
             case result of
-                Ok data ->
-                    ( { model | data = Success data }
+                Ok schedule ->
+                    ( { model | schedule = Success schedule }
                         |> populateDrawSheetValues
                         |> updateGames
                     , Cmd.none
@@ -43,27 +44,27 @@ update msg model =
                     let
                         errorMessage =
                             case err of
-                                Http.BadUrl string ->
-                                    "Bad URL used to fetch data: " ++ string
+                                RemoteData.Http.BadUrl string ->
+                                    "Bad URL used to fetch schedule: " ++ string
 
-                                Http.Timeout ->
-                                    "Network timeout when trying to fetch data."
+                                RemoteData.Http.Timeout ->
+                                    "Network timeout when trying to fetch schedule."
 
-                                Http.NetworkError ->
-                                    "Network error when trying to fetch data."
+                                RemoteData.Http.NetworkError ->
+                                    "Network error when trying to fetch schedule."
 
-                                Http.BadStatus int ->
-                                    "Bad status response from server when trying to fetch data."
+                                RemoteData.Http.BadStatus int ->
+                                    "Bad status response from server when trying to fetch schedule."
 
-                                Http.BadBody string ->
-                                    "Bad body response from server when trying to fetch data: " ++ string
+                                RemoteData.Http.BadBody string ->
+                                    "Bad body response from server when trying to fetch schedule: " ++ string
                     in
-                    ( { model | data = Failure errorMessage, changed = False, validated = True }, Cmd.none )
+                    ( { model | schedule = Failure errorMessage, changed = False, validated = True }, Cmd.none )
 
-        Saved result ->
+        PatchedDraws result ->
             case result of
-                Ok data ->
-                    ( { model | savedData = SaveSuccess data, changed = False }
+                Ok savedDraws ->
+                    ( { model | savedDraws = SaveSuccess savedDraws, changed = False }
                     , Cmd.none
                     )
 
@@ -71,25 +72,25 @@ update msg model =
                     let
                         errorMessage =
                             case err of
-                                Http.BadUrl string ->
-                                    "Bad URL used to fetch data: " ++ string
+                                RemoteData.Http.BadUrl string ->
+                                    "Bad URL used to save draws: " ++ string
 
-                                Http.Timeout ->
-                                    "Network timeout when trying to fetch data."
+                                RemoteData.Http.Timeout ->
+                                    "Network timeout when trying to save draws."
 
-                                Http.NetworkError ->
-                                    "Network error when trying to fetch data."
+                                RemoteData.Http.NetworkError ->
+                                    "Network error when trying to save draws."
 
-                                Http.BadStatus int ->
-                                    "Bad status response from server when trying to fetch data."
+                                RemoteData.Http.BadStatus int ->
+                                    "Bad status response from server when trying to save draws."
 
-                                Http.BadBody string ->
-                                    "Bad body response from server when trying to fetch data: " ++ string
+                                RemoteData.Http.BadBody string ->
+                                    "Bad body response from server when trying to save draws: " ++ string
                     in
-                    ( { model | savedData = SaveFailure errorMessage }, Cmd.none )
+                    ( { model | savedDraws = SaveFailure errorMessage }, Cmd.none )
 
         DiscardChanges ->
-            ( { model | data = Loading, changed = False, validated = True }, getData model.flags.url )
+            ( { model | schedule = Loading, changed = False, validated = True }, getSchedule model.flags.url )
 
         UpdateDrawLabel onIndex newLabel ->
             let
@@ -106,15 +107,15 @@ update msg model =
                 updatedDraws draws =
                     List.indexedMap (updatedDraw draws) draws
 
-                updatedData =
-                    case model.data of
-                        Success decodedData ->
-                            Success { decodedData | draws = updatedDraws decodedData.draws }
+                updatedSchedule =
+                    case model.schedule of
+                        Success decodedSchedule ->
+                            Success { decodedSchedule | draws = updatedDraws decodedSchedule.draws }
 
                         _ ->
-                            model.data
+                            model.schedule
             in
-            ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
+            ( { model | schedule = updatedSchedule, changed = True, validated = False }, Cmd.none )
 
         UpdateDrawStartsAt onIndex newStartsAt ->
             let
@@ -131,15 +132,15 @@ update msg model =
                 updatedDraws draws =
                     List.indexedMap (updatedDraw draws) draws
 
-                updatedData =
-                    case model.data of
-                        Success decodedData ->
-                            Success { decodedData | draws = updatedDraws decodedData.draws }
+                updatedSchedule =
+                    case model.schedule of
+                        Success decodedSchedule ->
+                            Success { decodedSchedule | draws = updatedDraws decodedSchedule.draws }
 
                         _ ->
-                            model.data
+                            model.schedule
             in
-            ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
+            ( { model | schedule = updatedSchedule, changed = True, validated = False }, Cmd.none )
 
         UpdateDrawAttendance onIndex newAttendance ->
             let
@@ -156,49 +157,49 @@ update msg model =
                 updatedDraws draws =
                     List.indexedMap updatedDraw draws
 
-                updatedData =
-                    case model.data of
-                        Success decodedData ->
-                            if decodedData.settings.hasAttendance then
-                                Success { decodedData | draws = updatedDraws decodedData.draws }
+                updatedSchedule =
+                    case model.schedule of
+                        Success decodedSchedule ->
+                            if decodedSchedule.settings.hasAttendance then
+                                Success { decodedSchedule | draws = updatedDraws decodedSchedule.draws }
 
                             else
-                                model.data
+                                model.schedule
 
                         _ ->
-                            model.data
+                            model.schedule
             in
-            ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
+            ( { model | schedule = updatedSchedule, changed = True, validated = False }, Cmd.none )
 
         SelectedGame onDrawIndex onDrawSheet value ->
             let
-                updatedDrawSheet data draw drawSheet =
+                updatedDrawSheet draw drawSheet =
                     if drawSheet.sheet == onDrawSheet.sheet then
                         { drawSheet | value = value, gameId = Nothing, changed = True }
 
                     else
                         drawSheet
 
-                updatedDrawSheets data index draw =
+                updatedDrawSheets schedule index draw =
                     if index == onDrawIndex then
-                        { draw | drawSheets = List.map (updatedDrawSheet data draw) draw.drawSheets }
-                            |> validateDrawSheets data
+                        { draw | drawSheets = List.map (updatedDrawSheet draw) draw.drawSheets }
+                            |> validateDrawSheets schedule
 
                     else
                         draw
 
-                updatedDraws data =
-                    List.indexedMap (updatedDrawSheets data) data.draws
+                updatedDraws schedule =
+                    List.indexedMap (updatedDrawSheets schedule) schedule.draws
 
-                updatedData =
-                    case model.data of
-                        Success decodedData ->
-                            Success { decodedData | draws = updatedDraws decodedData }
+                updatedSchedule =
+                    case model.schedule of
+                        Success decodedSchedule ->
+                            Success { decodedSchedule | draws = updatedDraws decodedSchedule }
 
                         _ ->
-                            model.data
+                            model.schedule
             in
-            ( { model | data = updatedData, changed = True, validated = False }
+            ( { model | schedule = updatedSchedule, changed = True, validated = False }
                 |> updateGames
             , Cmd.none
             )
@@ -221,37 +222,37 @@ update msg model =
                     in
                     draws ++ [ Draw Nothing nextLabel nextStartsAt nextAttendance (List.indexedMap newDrawSheet sheets) ]
 
-                updatedData =
-                    case model.data of
-                        Success decodedData ->
-                            Success { decodedData | draws = updatedDraws decodedData.sheets decodedData.draws }
+                updatedSchedule =
+                    case model.schedule of
+                        Success decodedSchedule ->
+                            Success { decodedSchedule | draws = updatedDraws decodedSchedule.sheets decodedSchedule.draws }
 
                         _ ->
-                            model.data
+                            model.schedule
             in
-            ( { model | data = updatedData, changed = True, validated = False }, Cmd.none )
+            ( { model | schedule = updatedSchedule, changed = True, validated = False }, Cmd.none )
 
         DeleteDraw index ->
             let
                 updatedDraws draws =
                     List.Extra.removeAt index draws
 
-                updatedData =
-                    case model.data of
-                        Success decodedData ->
-                            Success { decodedData | draws = updatedDraws decodedData.draws }
+                updatedSchedule =
+                    case model.schedule of
+                        Success decodedSchedule ->
+                            Success { decodedSchedule | draws = updatedDraws decodedSchedule.draws }
 
                         _ ->
-                            model.data
+                            model.schedule
             in
-            ( { model | data = updatedData, changed = True }, Cmd.none )
+            ( { model | schedule = updatedSchedule, changed = True }, Cmd.none )
 
         Save ->
             let
                 postDraws =
-                    case model.data of
-                        Success decodedData ->
-                            saveDraws model.flags.url decodedData.draws
+                    case model.schedule of
+                        Success decodedSchedule ->
+                            saveDraws model.flags.url decodedSchedule.draws
 
                         _ ->
                             Cmd.none

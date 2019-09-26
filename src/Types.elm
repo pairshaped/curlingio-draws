@@ -1,14 +1,16 @@
 module Types exposing (..)
 
-import Http
 import Json.Decode as Decode exposing (Decoder, bool, index, int, list, map2, nullable, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Json.Encode as Encode
 import Json.Encode.Extra exposing (maybe)
+import RemoteData exposing (RemoteData(..), WebData)
+import RemoteData.Http
 
 
 type Msg
-    = GotData (Result Http.Error Data)
+    = GotSchedule (WebData Schedule)
+    | PatchedDraws (WebData SavedDraws)
     | DiscardChanges
     | UpdateDrawLabel Int String
     | UpdateDrawStartsAt Int String
@@ -17,7 +19,15 @@ type Msg
     | AddDraw
     | DeleteDraw Int
     | Save
-    | Saved (Result Http.Error String)
+
+
+type alias Model =
+    { flags : Flags
+    , schedule : WebData Schedule
+    , changed : Bool
+    , validated : Bool
+    , savedDraws : SavedDraws
+    }
 
 
 type alias Flags =
@@ -25,36 +35,17 @@ type alias Flags =
     }
 
 
-type RemoteData
-    = NotAsked
-    | Loading
-    | Failure String
-    | Success Data
-
-
-type SavedData
-    = NotAttempted
-    | Saving
-    | SaveFailure String
-    | SaveSuccess String
-
-
-type alias Model =
-    { flags : Flags
-    , data : RemoteData
-    , changed : Bool
-    , validated : Bool
-    , savedData : SavedData
-    }
-
-
-type alias Data =
+type alias Schedule =
     { settings : Settings
     , sheets : List String
     , teams : List Team
     , games : List Game
     , draws : List Draw
     }
+
+
+type alias SavedDraws =
+    { draws : List Draw }
 
 
 type alias Settings =
@@ -113,9 +104,9 @@ type alias DrawSheet =
     }
 
 
-dataDecoder : Decoder Data
-dataDecoder =
-    Decode.succeed Data
+scheduleDecoder : Decoder Schedule
+scheduleDecoder =
+    Decode.succeed Schedule
         |> required "settings" settingsDecoder
         |> required "sheets" (list string)
         |> required "teams" (list teamDecoder)
@@ -147,6 +138,12 @@ gameDecoder =
 teamIdsDecoder : Decoder ( Int, Int )
 teamIdsDecoder =
     map2 Tuple.pair (index 0 int) (index 1 int)
+
+
+savedDrawsDecoder : Decoder SavedDraws
+savedDrawsDecoder =
+    Decode.succeed SavedDraws
+        |> required "draws" (list drawDecoder)
 
 
 drawDecoder : Decoder Draw
