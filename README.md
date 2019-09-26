@@ -42,3 +42,4 @@ yarn start
 - [x] Validate draw sheet input is game assigned that would not result it a team playing more than once in the same draw.
 - [x] Draw deletion.
 - [x] Implement save / serilization
+- [ ] Copy the starts at from the previous draw (if there is one) when adding a new draw, just to have a decent starting point.
