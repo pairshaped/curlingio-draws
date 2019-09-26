@@ -74,7 +74,7 @@ viewSheets : Data -> Html Msg
 viewSheets data =
     let
         addAttendance list =
-            if data.hasAttendance then
+            if data.settings.hasAttendance then
                 list ++ [ "Attend" ]
 
             else
@@ -105,7 +105,7 @@ viewDraws : Data -> Html Msg
 viewDraws data =
     tbody
         [ class "draws" ]
-        (List.indexedMap (viewDraw data.hasAttendance) data.draws)
+        (List.indexedMap (viewDraw data.settings.hasAttendance) data.draws)
 
 
 viewDraw : Bool -> Int -> Draw -> Html Msg

@@ -1,6 +1,7 @@
 module Helpers exposing (..)
 
 import Http
+import Json.Decode as Decode
 import List.Extra
 import Types exposing (..)
 
@@ -41,8 +42,21 @@ updateGames model =
 getData : String -> Cmd Msg
 getData url =
     Http.get
-        { url = url
+        { url = url ++ "/db"
         , expect = Http.expectJson GotData dataDecoder
+        }
+
+
+saveDraws : String -> List Draw -> Cmd Msg
+saveDraws url draws =
+    let
+        body =
+            Http.jsonBody <| encodeDraws draws
+    in
+    Http.post
+        { url = url ++ "/draws"
+        , body = body
+        , expect = Http.expectJson Saved Decode.string
         }
 
 

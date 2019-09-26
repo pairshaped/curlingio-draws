@@ -20,7 +20,7 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( Model flags NotAsked False True, getData flags.url )
+    ( Model flags NotAsked False True NotAttempted, getData flags.url )
 
 
 
@@ -58,6 +58,34 @@ update msg model =
                                     "Bad body response from server when trying to fetch data: " ++ string
                     in
                     ( { model | data = Failure errorMessage, changed = False, validated = True }, Cmd.none )
+
+        Saved result ->
+            case result of
+                Ok data ->
+                    ( { model | savedData = SaveSuccess "" }
+                    , Cmd.none
+                    )
+
+                Err err ->
+                    let
+                        errorMessage =
+                            case err of
+                                Http.BadUrl string ->
+                                    "Bad URL used to fetch data: " ++ string
+
+                                Http.Timeout ->
+                                    "Network timeout when trying to fetch data."
+
+                                Http.NetworkError ->
+                                    "Network error when trying to fetch data."
+
+                                Http.BadStatus int ->
+                                    "Bad status response from server when trying to fetch data."
+
+                                Http.BadBody string ->
+                                    "Bad body response from server when trying to fetch data: " ++ string
+                    in
+                    ( { model | savedData = SaveFailure errorMessage }, Cmd.none )
 
         DiscardChanges ->
             ( { model | data = Loading, changed = False, validated = True }, getData model.flags.url )
@@ -130,7 +158,7 @@ update msg model =
                 updatedData =
                     case model.data of
                         Success decodedData ->
-                            if decodedData.hasAttendance then
+                            if decodedData.settings.hasAttendance then
                                 Success { decodedData | draws = updatedDraws decodedData.draws }
 
                             else
@@ -218,7 +246,16 @@ update msg model =
             ( { model | data = updatedData, changed = True }, Cmd.none )
 
         Save ->
-            ( model, Cmd.none )
+            let
+                postDraws =
+                    case model.data of
+                        Success decodedData ->
+                            saveDraws model.flags.url decodedData.draws
+
+                        _ ->
+                            Cmd.none
+            in
+            ( model, postDraws )
 
 
 

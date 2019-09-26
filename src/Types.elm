@@ -3,6 +3,8 @@ module Types exposing (..)
 import Http
 import Json.Decode as Decode exposing (Decoder, bool, index, int, list, map2, nullable, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Encode as Encode
+import Json.Encode.Extra exposing (maybe)
 
 
 type Msg
@@ -15,6 +17,7 @@ type Msg
     | AddDraw
     | DeleteDraw Int
     | Save
+    | Saved (Result Http.Error String)
 
 
 type alias Flags =
@@ -29,21 +32,33 @@ type RemoteData
     | Success Data
 
 
+type SavedData
+    = NotAttempted
+    | Saving
+    | SaveFailure String
+    | SaveSuccess String
+
+
 type alias Model =
     { flags : Flags
     , data : RemoteData
     , changed : Bool
     , validated : Bool
+    , savedData : SavedData
     }
 
 
 type alias Data =
-    { hasAttendance : Bool
+    { settings : Settings
     , sheets : List String
     , teams : List Team
     , games : List Game
     , draws : List Draw
     }
+
+
+type alias Settings =
+    { hasAttendance : Bool }
 
 
 type alias Team =
@@ -101,11 +116,17 @@ type alias DrawSheet =
 dataDecoder : Decoder Data
 dataDecoder =
     Decode.succeed Data
-        |> optional "has_attendance" bool False
+        |> required "settings" settingsDecoder
         |> required "sheets" (list string)
         |> required "teams" (list teamDecoder)
         |> required "games" (list gameDecoder)
         |> required "draws" (list drawDecoder)
+
+
+settingsDecoder : Decoder Settings
+settingsDecoder =
+    Decode.succeed Settings
+        |> optional "has_attendance" bool False
 
 
 teamDecoder : Decoder Team
@@ -146,3 +167,37 @@ drawSheetDecoder =
         |> optional "value" string ""
         |> hardcoded False
         |> hardcoded True
+
+
+encodeDraws : List Draw -> Encode.Value
+encodeDraws draws =
+    Encode.list encodeDraw draws
+
+
+encodeDraw : Draw -> Encode.Value
+encodeDraw draw =
+    Encode.object
+        [ ( "id", maybe Encode.int draw.id )
+        , ( "label", Encode.string draw.label.value )
+        , ( "starts_at", Encode.string draw.startsAt.value )
+        , ( "attendance", maybe Encode.int draw.attendance.value )
+        , ( "draw_sheets", Encode.list encodeDrawSheet draw.drawSheets )
+        ]
+
+
+encodeDrawSheet : DrawSheet -> Encode.Value
+encodeDrawSheet drawSheet =
+    Encode.object
+        [ ( "sheet", Encode.int drawSheet.sheet )
+        , ( "game_id", maybe Encode.int drawSheet.gameId )
+        ]
+
+
+encodeMaybe : (a -> Encode.Value) -> Maybe a -> Encode.Value
+encodeMaybe encoder maybe =
+    case maybe of
+        Just value ->
+            encoder value
+
+        Nothing ->
+            Encode.null
