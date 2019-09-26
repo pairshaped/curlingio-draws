@@ -6,7 +6,6 @@ import Html.Attributes exposing (class, disabled, id, list, max, min, name, requ
 import Html.Events exposing (onClick, onInput)
 import Http
 import RemoteData exposing (RemoteData(..))
-import RemoteData.Http
 import Types exposing (..)
 
 

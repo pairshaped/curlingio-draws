@@ -4,8 +4,7 @@ import Json.Decode as Decode exposing (Decoder, bool, index, int, list, map2, nu
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Json.Encode as Encode
 import Json.Encode.Extra exposing (maybe)
-import RemoteData exposing (RemoteData(..), WebData)
-import RemoteData.Http
+import RemoteData exposing (WebData)
 
 
 type Msg

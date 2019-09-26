@@ -1,8 +1,7 @@
 module Helpers exposing (..)
 
-import Json.Decode as Decode
 import List.Extra
-import RemoteData exposing (RemoteData(..), WebData)
+import RemoteData exposing (RemoteData(..))
 import RemoteData.Http
 import Types exposing (..)
 
@@ -130,19 +129,6 @@ drawAttendanceIsValid value =
                 Nothing ->
                     False
            )
-
-
-drawSheetIsValid : Schedule -> String -> Bool
-drawSheetIsValid schedule value =
-    True
-
-
-validateDrawSheetSelection : List Draw -> Int -> DrawSheet -> List Draw
-validateDrawSheetSelection draws drawIndex drawSheet =
-    -- TODO make sure the selected value corresponds to a game.
-    -- TODO make sure the game hasn't already been assigned.
-    -- TODO make sure the game doesn't include a team that's already playing in the draw
-    draws
 
 
 nameOfGame : List Team -> Game -> String

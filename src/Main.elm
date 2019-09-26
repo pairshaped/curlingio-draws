@@ -1,11 +1,9 @@
 module Main exposing (..)
 
-import Array
 import Browser
 import Helpers exposing (..)
 import List.Extra
-import RemoteData exposing (RemoteData(..), WebData)
-import RemoteData.Http
+import RemoteData exposing (RemoteData(..))
 import Types exposing (..)
 import Views exposing (view)
 
