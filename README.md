@@ -29,7 +29,7 @@ yarn start
 
 ## Copyright and License
 
-Copyright &copy; 2019 Curling I/O using the [MIT License](https://opensource.org/licenses/MIT).
+Copyright &copy; 2019 Curling I/O using the [MIT License](blob/master/LICENSE).
 
 ## TODO
 
