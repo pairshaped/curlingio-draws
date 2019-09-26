@@ -6,24 +6,76 @@ import List.Extra
 import Types exposing (..)
 
 
+populateDrawSheetValues : Model -> Model
+populateDrawSheetValues model =
+    let
+        updatedDrawSheet data drawSheet =
+            { drawSheet
+                | value =
+                    case
+                        List.Extra.find
+                            (\g ->
+                                g.id
+                                    == (case drawSheet.gameId of
+                                            Just id ->
+                                                id
+
+                                            Nothing ->
+                                                -1
+                                       )
+                            )
+                            data.games
+                    of
+                        Just game ->
+                            nameOfGame data.teams game
+
+                        Nothing ->
+                            ""
+            }
+
+        updatedDraw data draw =
+            { draw | drawSheets = List.map (updatedDrawSheet data) draw.drawSheets }
+
+        updatedDraws data =
+            List.map (updatedDraw data) data.draws
+
+        updatedData =
+            case model.data of
+                Success decodedData ->
+                    Success { decodedData | draws = updatedDraws decodedData }
+
+                _ ->
+                    model.data
+    in
+    { model | data = updatedData }
+
+
 updateGames : Model -> Model
 updateGames model =
     let
         -- Loop through the games setting each to disabled if a matching drawSheet value is the same as it's name
-        gameIsSelectedInDraw teams game draw =
-            case List.Extra.find (.value >> (==) (nameOfGame teams game)) draw.drawSheets of
+        gameIsSelectedInDraw name game draw =
+            case List.Extra.find (\ds -> ds.value == name) draw.drawSheets of
                 Just drawSheet ->
                     True
 
                 Nothing ->
                     False
 
-        gameIsSelected data game =
-            List.map (gameIsSelectedInDraw data.teams game) data.draws
+        gameIsSelected name draws game =
+            List.map (gameIsSelectedInDraw name game) draws
                 |> List.member True
 
         updatedGame data game =
-            { game | disabled = gameIsSelected data game }
+            let
+                name =
+                    nameOfGame data.teams game
+            in
+            if gameIsSelected name data.draws game then
+                { game | disabled = True }
+
+            else
+                { game | disabled = False }
 
         updatedGames data =
             List.map (updatedGame data) data.games

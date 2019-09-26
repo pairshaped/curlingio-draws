@@ -34,6 +34,7 @@ update msg model =
             case result of
                 Ok data ->
                     ( { model | data = Success data }
+                        |> populateDrawSheetValues
                         |> updateGames
                     , Cmd.none
                     )

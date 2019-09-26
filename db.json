@@ -125,19 +125,15 @@
     , "draw_sheets":
       [ { "sheet": 0
         , "game_id": 1
-        , "value": "A vs B (G1)"
         }
       , { "sheet": 1
         , "game_id": 2
-        , "value": "C vs D (G2)"
         }
       , { "sheet": 2
         , "game_id": 3
-        , "value": "E vs F (G3)"
         }
       , { "sheet": 3
         , "game_id": 4
-        , "value": "G vs H (G4)"
         }
       ]
     }
@@ -148,19 +144,15 @@
     , "draw_sheets":
       [ { "sheet": 0
         , "game_id": 5
-        , "value": "F vs H (G5)"
         }
       , { "sheet": 1
         , "game_id": 6
-        , "value": "A vs C (G6)"
         }
       , { "sheet": 2
         , "game_id": 7
-        , "value": "B vs D (G7)"
         }
       , { "sheet": 3
         , "game_id": 8
-        , "value": "E vs G (G8)"
         }
       ]
     }
@@ -171,19 +163,15 @@
     , "draw_sheets":
       [ { "sheet": 0
         , "game_id": 9
-        , "value": "E vs H (G9)"
         }
       , { "sheet": 1
         , "game_id": 10
-        , "value": "F vs G (G10)"
         }
       , { "sheet": 2
         , "game_id": 11
-        , "value": "A vs D (G11)"
         }
       , { "sheet": 3
         , "game_id": 12
-        , "value": "B vs C (G12)"
         }
       ]
     }
