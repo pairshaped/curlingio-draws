@@ -1,5 +1,5 @@
 {
-  "data" : {
+  "data": {
     "settings": {
       "has_attendance": true
     },
@@ -246,7 +246,7 @@
         "id": 1,
         "label": "1",
         "starts_at": "2020-01-01T19:00",
-        "attendance": null,
+        "attendance": 200,
         "draw_sheets": [
           {
             "sheet": 0,
@@ -270,7 +270,7 @@
         "id": 2,
         "label": "2",
         "starts_at": "2020-01-08T19:00",
-        "attendance": null,
+        "attendance": 100,
         "draw_sheets": [
           {
             "sheet": 0,
@@ -294,7 +294,7 @@
         "id": 3,
         "label": "3",
         "starts_at": "2020-01-15T19:00",
-        "attendance": null,
+        "attendance": 120,
         "draw_sheets": [
           {
             "sheet": 0,

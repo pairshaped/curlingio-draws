@@ -63,7 +63,7 @@ update msg model =
         Saved result ->
             case result of
                 Ok data ->
-                    ( { model | savedData = SaveSuccess "" }
+                    ( { model | savedData = SaveSuccess data, changed = False }
                     , Cmd.none
                     )
 

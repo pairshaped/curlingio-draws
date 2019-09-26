@@ -94,7 +94,7 @@ updateGames model =
 getData : String -> Cmd Msg
 getData url =
     Http.get
-        { url = url ++ "/db"
+        { url = url
         , expect = Http.expectJson GotData dataDecoder
         }
 
@@ -105,10 +105,14 @@ saveDraws url draws =
         body =
             Http.jsonBody <| encodeDraws draws
     in
-    Http.post
-        { url = url ++ "/draws"
+    Http.request
+        { method = "PATCH"
+        , headers = []
+        , url = url
         , body = body
         , expect = Http.expectJson Saved Decode.string
+        , timeout = Nothing
+        , tracker = Nothing
         }
 
 

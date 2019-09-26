@@ -171,7 +171,8 @@ drawSheetDecoder =
 
 encodeDraws : List Draw -> Encode.Value
 encodeDraws draws =
-    Encode.list encodeDraw draws
+    Encode.object
+        [ ( "draws", Encode.list encodeDraw draws ) ]
 
 
 encodeDraw : Draw -> Encode.Value
