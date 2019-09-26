@@ -1,6 +1,8 @@
 # Description
 
-This is the draw sheet editor for Curling I/O.
+Draw sheet editor created and used by Curling I/O.
+
+![Draw Schedule editor for Curling I/O](curlingio-draws.gif?raw=true "Draw Schedule editor for Curling I/O")
 
 ## Requirements:
 
