@@ -8,8 +8,12 @@ This is the draw sheet editor for Curling I/O.
 2. A draw schedule can have a large number of draws, sheets, and games. Editing needs to be performant. Native JS or jQuery w/ standard selects is very slow.
 3. When a game is selected it needs to be removed from the pool of available games.
 4. When a game is de-selected it needs to be added back to the pool of available games.
-5. Datalists w/ inputs allow you to enter any value, and it might not be a valid game. Before sending the updated schedule to the server, invalid values needs to be removed.
-6. Post JSON data to the server on save.
+5. Validate changes to label, starts at, draw sheet game selection (make sure teams aren't double booked), and attendance.
+6. Save the draws back to the server.
+
+## Roadmap
+
+Draw Schedule generation / regeneration based on games, dates, sheets, exclusions, etc.
 
 ## Installing Dependencies
 
@@ -38,7 +42,3 @@ yarn start
 - [x] Validate draw sheet input is game assigned that would not result it a team playing more than once in the same draw.
 - [x] Draw deletion.
 - [x] Implement save / serilization
-
-## Roadmap Features
-
-- [ ] Draw Schedule generation / regeneration based on games, dates, sheets, exclusions, etc.
