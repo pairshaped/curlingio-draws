@@ -27,6 +27,10 @@ yarn
 yarn start
 ```
 
+## Copyright and License
+
+Copyright &copy; 2019 Curling I/O using the [MIT License](https://opensource.org/licenses/MIT).
+
 ## TODO
 
 - [x] Highlight fields that have changed since last save.
