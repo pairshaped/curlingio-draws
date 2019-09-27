@@ -151,7 +151,16 @@ update msg model =
                             DrawLabel (String.fromInt (List.length draws + 1)) True True
 
                         nextStartsAt =
-                            DrawStartsAt "" True False
+                            let
+                                previousStartsAt =
+                                    case List.Extra.last draws of
+                                        Just draw ->
+                                            draw.startsAt.value
+
+                                        Nothing ->
+                                            ""
+                            in
+                            DrawStartsAt previousStartsAt True False
 
                         nextAttendance =
                             DrawAttendance Nothing True True
