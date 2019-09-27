@@ -55,26 +55,18 @@ viewSchedule model schedule =
     div [ class "container mt-3" ]
         [ viewHeader model
         , datalist [ id "games" ] (List.map (viewGameOption schedule.teams) schedule.games)
-        , viewDrawsContainer schedule
+        , viewDrawsContainer model schedule
         , viewFooter model
         ]
 
 
 viewHeader : Model -> Html Msg
 viewHeader model =
-    div [ class "mb-4 d-flex" ]
-        [ div
-            [ class "mr-3" ]
-            [ em
-                []
-                [ text "Select the games to be played in each draw. If an input is highlighted in red, it's invalid and needs to be fixed. If an input in highlighted in yellow, it's been modified but not yet saved." ]
-            ]
-        , div []
-            [ div
-                [ class "text-right" ]
-                [ button [ class "btn btn-primary", disabled (not model.changed || not (validForSave model)), onClick Save ] [ text "Save" ]
-                ]
-            ]
+    p
+        [ class "small" ]
+        [ em
+            []
+            [ text "Select the games to be played in each draw. If an input is highlighted in red, it's invalid and needs to be fixed. If an input in highlighted in yellow, it's been modified but not yet saved." ]
         ]
 
 
@@ -83,14 +75,16 @@ viewGameOption teams game =
     option [ disabled game.disabled, value game.name ] []
 
 
-viewDrawsContainer : Schedule -> Html Msg
-viewDrawsContainer schedule =
+viewDrawsContainer : Model -> Schedule -> Html Msg
+viewDrawsContainer model schedule =
     div
         [ class "table-responsive" ]
         [ table
-            [ class "draws-container table table-sm table-borderless table-striped" ]
+            [ class "draws-container table table-sm table-borderless table-striped"
+            , style "table-layout" "fixed"
+            ]
             [ viewSheets schedule
-            , viewDraws schedule
+            , viewDraws model schedule
             ]
         ]
 
@@ -98,43 +92,72 @@ viewDrawsContainer schedule =
 viewSheets : Schedule -> Html Msg
 viewSheets schedule =
     let
-        addAttendance list =
+        labelHeader list =
+            th
+                [ class "draw_label"
+                , style "width" "70px"
+                ]
+                [ text "Label" ]
+                :: list
+
+        startsAtHeader list =
+            th
+                [ class "draw_starts-at"
+                , style "width" "265px"
+                ]
+                [ text "Starts at" ]
+                :: list
+
+        sheetHeader sheet =
+            th
+                [ class "draw_sheet"
+                , style "width" "150px"
+                ]
+                [ text sheet ]
+
+        attendanceHeader list =
             if schedule.settings.hasAttendance then
-                list ++ [ "Attend" ]
+                list
+                    ++ [ th
+                            [ class "draw_attendance"
+                            , style "width" "80px"
+                            ]
+                            [ text "Attend" ]
+                       ]
 
             else
                 list
 
-        addDelete list =
-            list ++ [ "" ]
+        deleteHeader list =
+            list
+                ++ [ th
+                        [ class "draw_delete"
+                        , style "width" "35px"
+                        ]
+                        [ text "" ]
+                   ]
     in
     thead []
-        [ tr []
-            (List.map viewSheet
-                (schedule.sheets
-                    |> (::) "Starts at"
-                    |> (::) "Label"
-                    |> addAttendance
-                    |> addDelete
-                )
+        [ tr
+            []
+            (List.map sheetHeader schedule.sheets
+                |> startsAtHeader
+                |> labelHeader
+                |> attendanceHeader
+                |> deleteHeader
             )
         ]
 
 
-viewSheet : String -> Html Msg
-viewSheet sheet =
-    th [ class "pl-2 pb-2" ] [ text sheet ]
-
-
-viewDraws : Schedule -> Html Msg
-viewDraws schedule =
+viewDraws : Model -> Schedule -> Html Msg
+viewDraws model schedule =
     tbody
         [ class "draws" ]
-        (List.indexedMap (viewDraw schedule.settings.hasAttendance) schedule.draws)
+        (List.indexedMap (viewDraw model schedule.settings.hasAttendance) schedule.draws)
 
 
-viewDraw : Bool -> Int -> Draw -> Html Msg
-viewDraw hasAttendance index draw =
+viewDraw : Model -> Bool -> Int -> Draw -> Html Msg
+viewDraw model hasAttendance index draw =
     let
         addAttendance list =
             if hasAttendance then
@@ -144,7 +167,7 @@ viewDraw hasAttendance index draw =
                 list
 
         addDelete list =
-            list ++ [ viewDelete index ]
+            list ++ [ viewDelete model index ]
     in
     tr
         [ class "draw" ]
@@ -160,10 +183,7 @@ viewDraw hasAttendance index draw =
 viewDrawLabel : Int -> Draw -> Html Msg
 viewDrawLabel index draw =
     td
-        [ class "draw_label p-1"
-        , style "min-width" "70px"
-        , style "max-width" "120px"
-        ]
+        []
         [ input
             [ class "form-control"
             , style "border"
@@ -189,10 +209,7 @@ viewDrawLabel index draw =
 viewStartsAt : Int -> Draw -> Html Msg
 viewStartsAt index draw =
     td
-        [ class "draw_starts-at p-1"
-        , style "min-width" "265px"
-        , style "max-width" "265px"
-        ]
+        []
         [ input
             [ class "form-control"
             , style "border"
@@ -219,10 +236,7 @@ viewStartsAt index draw =
 viewDrawSheet : Int -> DrawSheet -> Html Msg
 viewDrawSheet index drawSheet =
     td
-        [ class "draw_sheet p-1"
-        , style "min-width" "120px"
-        , style "max-width" "180px"
-        ]
+        []
         [ input
             [ class "form-control"
             , style "border"
@@ -248,10 +262,7 @@ viewDrawSheet index drawSheet =
 viewAttendance : Int -> Draw -> Html Msg
 viewAttendance index draw =
     td
-        [ class "draw_attendance p-1"
-        , style "min-width" "70px"
-        , style "max-width" "120px"
-        ]
+        []
         [ input
             [ class "form-control"
             , style "border"
@@ -284,15 +295,12 @@ viewAttendance index draw =
         ]
 
 
-viewDelete : Int -> Html Msg
-viewDelete index =
+viewDelete : Model -> Int -> Html Msg
+viewDelete model index =
     td
-        [ class "draw_delete p-2 text-right"
-        , style "min-width" "40px"
-        , style "max-width" "40px"
-        ]
+        [ class "text-right", style "padding-top" "7px" ]
         [ button
-            [ class "btn btn-sm btn-danger", onClick (DeleteDraw index) ]
+            [ class "btn btn-sm btn-danger", disabled (model.savedDraws == Loading), onClick (DeleteDraw index) ]
             [ text "X" ]
         ]
 
@@ -301,9 +309,16 @@ viewFooter : Model -> Html Msg
 viewFooter model =
     div [ class "footer row" ]
         [ div
-            [ class "col" ]
-            [ button [ class "btn btn-primary", onClick AddDraw ] [ text "Add draw" ] ]
+            [ class "col d-flex" ]
+            [ div
+                [ class "mr-1" ]
+                [ button [ class "btn btn-primary", style "min-width" "90px", disabled (model.savedDraws == Loading || not model.changed || not (validForSave model)), onClick Save ] [ text "Save" ]
+                ]
+            , div
+                [ class "mr-1" ]
+                [ button [ class "btn btn-danger", style "min-width" "90px", disabled (model.savedDraws == Loading || not model.changed), onClick DiscardChanges ] [ text "Reset" ] ]
+            ]
         , div
             [ class "col text-right" ]
-            [ button [ class "btn btn-secondary ml-1", disabled (not model.changed), onClick DiscardChanges ] [ text "Discard changes" ] ]
+            [ button [ class "btn btn-primary", style "min-width" "90px", disabled (model.savedDraws == Loading), onClick AddDraw ] [ text "Add Draw" ] ]
         ]
