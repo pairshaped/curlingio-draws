@@ -27,23 +27,6 @@ yarn
 yarn start
 ```
 
-## TODO
-
-- [x] Highlight fields that have changed since last save.
-- [x] Implement a reset to undo changes since last save. (re-fetch JSON)
-- [x] Hide attendance for events that aren't tracking it.
-- [x] Highlight draw label, starts at, sheet, attendance inputs if they aren't valid.
-- [x] Validate draw starts at isn't blank.
-- [x] Validate draw starts at is unique across all draws.
-- [x] Validate draw label isn't blank.
-- [x] Validate draw label is unique across all draws.
-- [x] Validate draw attendance is not a negative number.
-- [x] Validate draw attendance is a reasonable number (not too high).
-- [x] Validate draw sheet input is game assigned that would not result it a team playing more than once in the same draw.
-- [x] Draw deletion.
-- [x] Implement save / serilization
-- [ ] Copy the starts at from the previous draw (if there is one) when adding a new draw, just to have a decent starting point.
-
 ## Copyright and License
 
 Draw Schedule Editor
