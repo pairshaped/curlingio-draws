@@ -46,7 +46,7 @@ view model =
 viewNotReady : String -> Html Msg
 viewNotReady message =
     div
-        [ class "container mt-3" ]
+        [ class "mt-3" ]
         [ text message ]
 
 
