@@ -38,6 +38,9 @@ yarn
 yarn start
 ```
 
+## Source
+<https://github.com/pairshaped/curlingio-draws>
+
 ## Copyright and License
 
 Draw Schedule Editor
