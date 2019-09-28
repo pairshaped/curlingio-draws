@@ -2,7 +2,7 @@
   "scripts": {
     "start": "nf start",
     "client": "elm-live src/Main.elm --start-page=dev.html --open -- --output=dev.js",
-    "server": "json-server --watch db.json --delay 300"
+    "server": "json-server --watch db.json"
   },
   "dependencies": {
     "elm": "^0.19.0-no-deps",

@@ -114,14 +114,14 @@ viewSheets schedule =
 viewDraws : Model -> Schedule -> Html Msg
 viewDraws model schedule =
     tbody []
-        (List.indexedMap (viewDraw model schedule.settings.hasAttendance) schedule.draws)
+        (List.indexedMap (viewDraw model schedule.settings) schedule.draws)
 
 
-viewDraw : Model -> Bool -> Int -> Draw -> Html Msg
-viewDraw model hasAttendance index draw =
+viewDraw : Model -> Settings -> Int -> Draw -> Html Msg
+viewDraw model settings index draw =
     let
         addAttendance list =
-            if hasAttendance then
+            if settings.hasAttendance then
                 list ++ [ viewAttendance index draw ]
 
             else
@@ -133,7 +133,7 @@ viewDraw model hasAttendance index draw =
     tr []
         (List.map (viewDrawSheet index)
             draw.drawSheets
-            |> (::) (viewStartsAt index draw)
+            |> (::) (viewStartsAt settings index draw)
             |> (::) (viewDrawLabel index draw)
             |> addAttendance
             |> addDelete
@@ -165,8 +165,8 @@ viewDrawLabel index draw =
         ]
 
 
-viewStartsAt : Int -> Draw -> Html Msg
-viewStartsAt index draw =
+viewStartsAt : Settings -> Int -> Draw -> Html Msg
+viewStartsAt settings index draw =
     td []
         [ input
             [ class "form-control"
@@ -184,6 +184,8 @@ viewStartsAt index draw =
                 )
             , onInput (UpdateDrawStartsAt index)
             , type_ "datetime-local"
+            , min settings.minDateTime
+            , max settings.maxDateTime
             , required True
             , value draw.startsAt.value
             ]

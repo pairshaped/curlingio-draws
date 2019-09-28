@@ -1,7 +1,9 @@
 {
   "schedule": {
     "settings": {
-      "has_attendance": true
+      "has_attendance": true,
+      "min_datetime": "2019-10-28T00:00",
+      "max_datetime": "2020-04-25T23:59"
     },
     "sheets": [
       "Sheet A",

@@ -48,7 +48,10 @@ type alias SavedDraws =
 
 
 type alias Settings =
-    { hasAttendance : Bool }
+    { hasAttendance : Bool
+    , minDateTime : String
+    , maxDateTime : String
+    }
 
 
 type alias Team =
@@ -118,6 +121,8 @@ settingsDecoder : Decoder Settings
 settingsDecoder =
     Decode.succeed Settings
         |> optional "has_attendance" bool False
+        |> required "min_datetime" string
+        |> required "max_datetime" string
 
 
 teamDecoder : Decoder Team
