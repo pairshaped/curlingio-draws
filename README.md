@@ -1,4 +1,4 @@
-# Draw Schedule Editor for Curling I/O
+# Draw Schedule Editor for [Curling I/O](https://curling.io)
 
 ![Draw Schedule editor for Curling I/O](curlingio-draws.gif?raw=true "Draw Schedule editor for Curling I/O")
 
