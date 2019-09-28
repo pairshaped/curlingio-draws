@@ -52,7 +52,7 @@ viewNotReady message =
 
 viewSchedule : Model -> Schedule -> Html Msg
 viewSchedule model schedule =
-    div [ class "container mt-3" ]
+    div [ class "mt-3" ]
         [ datalist [ id "games" ] (List.map (viewGameOption schedule.teams) schedule.games)
         , viewDrawsContainer model schedule
         , viewFooter model
