@@ -2,6 +2,17 @@
 
 ![Draw Schedule editor for Curling I/O](curlingio-draws.gif?raw=true "Draw Schedule editor for Curling I/O")
 
+## Features:
+
+* Great performance with large numbers of games and draws due to the native `datalist` element.
+* Changes are highlighted in yellow / orange.
+* Errors are highlighted in red.
+* Games removed from the dropdown list once they've been scheduled, and added back to the list when they are removed from the schedule.
+* Teams cannot be assigned more than once per draw (a team can't play more than once per draw).
+* Labels are validated for uniqueness.
+* Start times are validated for uniqueness and presence.
+* The ability to discard any changes that haven't been saved.
+
 ## Requirements:
 
 1. Accept JSON data from the server representing the current schedule assignments, available games that can be assigned, and the number of sheets.
