@@ -13,15 +13,6 @@
 * Start times are validated for uniqueness and presence.
 * The ability to discard any changes that haven't been saved.
 
-## Requirements:
-
-1. Accept JSON data from the server representing the current schedule assignments, available games that can be assigned, and the number of sheets.
-2. A draw schedule can have a large number of draws, sheets, and games. Editing needs to be performant. Native JS or jQuery w/ standard selects is very slow.
-3. When a game is selected it needs to be removed from the pool of available games.
-4. When a game is de-selected it needs to be added back to the pool of available games.
-5. Validate changes to label, starts at, draw sheet game selection (make sure teams aren't double booked), and attendance.
-6. Save the draws back to the server.
-
 ## Roadmap
 
 Draw Schedule generation / regeneration based on games, dates, sheets, exclusions, etc.
