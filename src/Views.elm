@@ -80,7 +80,7 @@ viewDrawsContainer model schedule =
     div
         [ class "table-responsive" ]
         [ table
-            [ class "draws-container table table-sm table-borderless table-striped"
+            [ class "table table-sm table-borderless table-striped"
             , style "table-layout" "fixed"
             ]
             [ viewSheets schedule
@@ -93,53 +93,26 @@ viewSheets : Schedule -> Html Msg
 viewSheets schedule =
     let
         labelHeader list =
-            th
-                [ class "draw_label"
-                , style "width" "70px"
-                ]
-                [ text "Label" ]
-                :: list
+            th [ style "width" "70px" ] [ text "Label" ] :: list
 
         startsAtHeader list =
-            th
-                [ class "draw_starts-at"
-                , style "width" "265px"
-                ]
-                [ text "Starts at" ]
-                :: list
+            th [ style "width" "265px" ] [ text "Starts at" ] :: list
 
         sheetHeader sheet =
-            th
-                [ class "draw_sheet"
-                , style "width" "150px"
-                ]
-                [ text sheet ]
+            th [ style "width" "150px" ] [ text sheet ]
 
         attendanceHeader list =
             if schedule.settings.hasAttendance then
-                list
-                    ++ [ th
-                            [ class "draw_attendance"
-                            , style "width" "80px"
-                            ]
-                            [ text "Attend" ]
-                       ]
+                list ++ [ th [ style "width" "80px" ] [ text "Attend" ] ]
 
             else
                 list
 
         deleteHeader list =
-            list
-                ++ [ th
-                        [ class "draw_delete"
-                        , style "width" "35px"
-                        ]
-                        [ text "" ]
-                   ]
+            list ++ [ th [ style "width" "35px" ] [ text "" ] ]
     in
     thead []
-        [ tr
-            []
+        [ tr []
             (List.map sheetHeader schedule.sheets
                 |> startsAtHeader
                 |> labelHeader
@@ -151,8 +124,7 @@ viewSheets schedule =
 
 viewDraws : Model -> Schedule -> Html Msg
 viewDraws model schedule =
-    tbody
-        [ class "draws" ]
+    tbody []
         (List.indexedMap (viewDraw model schedule.settings.hasAttendance) schedule.draws)
 
 
@@ -169,8 +141,7 @@ viewDraw model hasAttendance index draw =
         addDelete list =
             list ++ [ viewDelete model index ]
     in
-    tr
-        [ class "draw" ]
+    tr []
         (List.map (viewDrawSheet index)
             draw.drawSheets
             |> (::) (viewStartsAt index draw)
@@ -182,8 +153,7 @@ viewDraw model hasAttendance index draw =
 
 viewDrawLabel : Int -> Draw -> Html Msg
 viewDrawLabel index draw =
-    td
-        []
+    td []
         [ input
             [ class "form-control"
             , style "border"
@@ -208,8 +178,7 @@ viewDrawLabel index draw =
 
 viewStartsAt : Int -> Draw -> Html Msg
 viewStartsAt index draw =
-    td
-        []
+    td []
         [ input
             [ class "form-control"
             , style "border"
@@ -235,8 +204,7 @@ viewStartsAt index draw =
 
 viewDrawSheet : Int -> DrawSheet -> Html Msg
 viewDrawSheet index drawSheet =
-    td
-        []
+    td []
         [ input
             [ class "form-control"
             , style "border"
@@ -261,8 +229,7 @@ viewDrawSheet index drawSheet =
 
 viewAttendance : Int -> Draw -> Html Msg
 viewAttendance index draw =
-    td
-        []
+    td []
         [ input
             [ class "form-control"
             , style "border"
@@ -300,14 +267,14 @@ viewDelete model index =
     td
         [ class "text-right", style "padding-top" "7px" ]
         [ button
-            [ class "btn btn-sm btn-danger", disabled (model.savedDraws == Loading), onClick (DeleteDraw index) ]
+            [ class "btn btn-sm btn-danger", style "min-width" "28px", disabled (model.savedDraws == Loading), onClick (DeleteDraw index) ]
             [ text "X" ]
         ]
 
 
 viewFooter : Model -> Html Msg
 viewFooter model =
-    div [ class "footer row" ]
+    div [ class "row mb-3" ]
         [ div
             [ class "col d-flex" ]
             [ div
