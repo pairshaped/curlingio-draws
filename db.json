@@ -277,19 +277,19 @@
         "attendance": 200,
         "draw_sheets": [
           {
-            "sheet": 0,
+            "sheet": 1,
             "game_id": 1
           },
           {
-            "sheet": 1,
+            "sheet": 2,
             "game_id": 2
           },
           {
-            "sheet": 2,
+            "sheet": 3,
             "game_id": 3
           },
           {
-            "sheet": 3,
+            "sheet": 4,
             "game_id": 4
           }
         ]
@@ -301,19 +301,19 @@
         "attendance": 100,
         "draw_sheets": [
           {
-            "sheet": 0,
+            "sheet": 1,
             "game_id": 5
           },
           {
-            "sheet": 1,
+            "sheet": 2,
             "game_id": 6
           },
           {
-            "sheet": 2,
+            "sheet": 3,
             "game_id": 7
           },
           {
-            "sheet": 3,
+            "sheet": 4,
             "game_id": 8
           }
         ]
@@ -325,19 +325,19 @@
         "attendance": 120,
         "draw_sheets": [
           {
-            "sheet": 0,
+            "sheet": 1,
             "game_id": 9
           },
           {
-            "sheet": 1,
+            "sheet": 2,
             "game_id": 10
           },
           {
-            "sheet": 2,
+            "sheet": 3,
             "game_id": 11
           },
           {
-            "sheet": 3,
+            "sheet": 4,
             "game_id": 12
           }
         ]
@@ -349,19 +349,19 @@
         "attendance": 50,
         "draw_sheets": [
           {
-            "sheet": 0,
+            "sheet": 1,
             "game_id": 13
           },
           {
-            "sheet": 1,
+            "sheet": 2,
             "game_id": 14
           },
           {
-            "sheet": 2,
+            "sheet": 3,
             "game_id": 15
           },
           {
-            "sheet": 3,
+            "sheet": 4,
             "game_id": 16
           }
         ]

@@ -143,7 +143,7 @@ update msg model =
         AddDraw ->
             let
                 newDrawSheet index sheet =
-                    DrawSheet index Nothing "" True True
+                    DrawSheet (index + 1) Nothing "" True True
 
                 updatedDraws sheets draws =
                     let
