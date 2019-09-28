@@ -53,20 +53,9 @@ viewNotReady message =
 viewSchedule : Model -> Schedule -> Html Msg
 viewSchedule model schedule =
     div [ class "container mt-3" ]
-        [ viewHeader model
-        , datalist [ id "games" ] (List.map (viewGameOption schedule.teams) schedule.games)
+        [ datalist [ id "games" ] (List.map (viewGameOption schedule.teams) schedule.games)
         , viewDrawsContainer model schedule
         , viewFooter model
-        ]
-
-
-viewHeader : Model -> Html Msg
-viewHeader model =
-    p
-        [ class "small" ]
-        [ em
-            []
-            [ text "Select the games to be played in each draw. If an input is highlighted in red, it's invalid and needs to be fixed. If an input in highlighted in yellow, it's been modified but not yet saved." ]
         ]
 
 
