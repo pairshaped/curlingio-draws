@@ -267,7 +267,7 @@ viewDelete model index =
     td
         [ class "text-right", style "padding-top" "7px" ]
         [ button
-            [ class "btn btn-sm btn-danger", style "min-width" "28px", disabled (model.savedDraws == Loading), onClick (DeleteDraw index) ]
+            [ class "btn btn-sm btn-secondary", style "min-width" "28px", disabled (model.savedDraws == Loading), onClick (DeleteDraw index) ]
             [ text "X" ]
         ]
 
@@ -283,7 +283,7 @@ viewFooter model =
                 ]
             , div
                 [ class "mr-1" ]
-                [ button [ class "btn btn-danger", style "min-width" "90px", disabled (model.savedDraws == Loading || not model.changed), onClick DiscardChanges ] [ text "Reset" ] ]
+                [ button [ class "btn btn-secondary", style "min-width" "90px", disabled (model.savedDraws == Loading || not model.changed), onClick DiscardChanges ] [ text "Reset" ] ]
             ]
         , div
             [ class "col text-right" ]
