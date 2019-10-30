@@ -6,10 +6,10 @@
       "max_datetime": "2020-04-25T23:59"
     },
     "sheets": [
-      "Sheet A",
-      "Sheet B",
-      "Sheet C",
-      "Sheet D"
+      "Sheet 1",
+      "Sheet 2",
+      "Sheet 3",
+      "Sheet 4"
     ],
     "teams": [
       {
@@ -352,19 +352,19 @@
         "draw_sheets": [
           {
             "sheet": 1,
-            "game_id": 13
+            "game_id": null
           },
           {
             "sheet": 2,
-            "game_id": 14
+            "game_id": null
           },
           {
             "sheet": 3,
-            "game_id": 15
+            "game_id": null
           },
           {
             "sheet": 4,
-            "game_id": 16
+            "game_id": null
           }
         ]
       }
