@@ -6,10 +6,10 @@
       "max_datetime": "2020-04-25T23:59"
     },
     "sheets": [
-      "Sheet A",
-      "Sheet B",
-      "Sheet C",
-      "Sheet D"
+      "Sheet 1",
+      "Sheet 2",
+      "Sheet 3",
+      "Sheet 4"
     ],
     "teams": [
       {

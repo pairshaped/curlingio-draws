@@ -1,4 +1,4 @@
-module Main exposing (..)
+module DrawSchedule exposing (..)
 
 import Browser
 import Helpers exposing (..)
