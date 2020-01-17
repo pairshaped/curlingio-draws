@@ -12,7 +12,7 @@ populateDrawSheetValues model =
         gameNameById id games =
             case List.Extra.find (\game -> game.id == id) games of
                 Just game ->
-                    game.name
+                    gameName game
 
                 Nothing ->
                     ""
@@ -50,7 +50,7 @@ updateGames model =
     let
         -- Loop through the games setting each to disabled if a matching drawSheet value is the same as it's name
         gameIsSelectedInDraw game draw =
-            case List.Extra.find (\ds -> ds.value == game.name) draw.drawSheets of
+            case List.Extra.find (\ds -> ds.value == gameName game) draw.drawSheets of
                 Just drawSheet ->
                     True
 
@@ -118,11 +118,16 @@ drawAttendanceIsValid value =
            )
 
 
+gameName : Game -> String
+gameName game =
+    game.name ++ " - " ++ game.stageName
+
+
 validateDrawSheets : Schedule -> Draw -> Draw
 validateDrawSheets schedule draw =
     let
         findGameByName name =
-            List.Extra.find (\game -> game.name == name) schedule.games
+            List.Extra.find (\game -> gameName game == name) schedule.games
 
         validateDrawSheet drawSheet =
             case findGameByName drawSheet.value of

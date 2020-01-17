@@ -2,7 +2,7 @@ module Views exposing (view)
 
 import Helpers exposing (..)
 import Html exposing (Html, button, datalist, div, em, input, option, p, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class, disabled, id, list, max, min, name, required, style, type_, value)
+import Html.Attributes exposing (class, disabled, id, list, min, name, required, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Http
 import RemoteData exposing (RemoteData(..))
@@ -61,7 +61,7 @@ viewSchedule model schedule =
 
 viewGameOption : List Team -> Game -> Html Msg
 viewGameOption teams game =
-    option [ disabled game.disabled, value game.name ] []
+    option [ disabled game.disabled, value (gameName game) ] []
 
 
 viewDrawsContainer : Model -> Schedule -> Html Msg
@@ -184,8 +184,8 @@ viewStartsAt settings index draw =
                 )
             , onInput (UpdateDrawStartsAt index)
             , type_ "datetime-local"
-            , min settings.minDateTime
-            , max settings.maxDateTime
+            , Html.Attributes.min settings.minDateTime
+            , Html.Attributes.max settings.maxDateTime
             , required True
             , value draw.startsAt.value
             ]
@@ -237,8 +237,8 @@ viewAttendance index draw =
                 )
             , type_ "number"
             , required True
-            , min "0"
-            , max "99999"
+            , Html.Attributes.min "0"
+            , Html.Attributes.max "99999"
             , onInput (UpdateDrawAttendance index)
             , value
                 (case draw.attendance.value of

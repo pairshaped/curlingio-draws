@@ -63,6 +63,7 @@ type alias Team =
 type alias Game =
     { id : Int
     , name : String
+    , stageName : String
     , teamIds : ( Int, Int )
     , disabled : Bool
     }
@@ -137,6 +138,7 @@ gameDecoder =
     Decode.succeed Game
         |> required "id" int
         |> required "name" string
+        |> required "stage_name" string
         |> required "team_ids" teamIdsDecoder
         |> hardcoded False
 
