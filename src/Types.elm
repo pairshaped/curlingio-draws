@@ -61,7 +61,7 @@ type alias Team =
 
 
 type alias Game =
-    { id : Int
+    { id : String
     , name : String
     , stageName : String
     , teamIds : ( Int, Int )
@@ -101,7 +101,7 @@ type alias Draw =
 
 type alias DrawSheet =
     { sheet : Int
-    , gameId : Maybe Int
+    , gameId : Maybe String
     , value : String
     , changed : Bool
     , valid : Bool
@@ -136,7 +136,7 @@ teamDecoder =
 gameDecoder : Decoder Game
 gameDecoder =
     Decode.succeed Game
-        |> required "id" int
+        |> required "id" string
         |> required "name" string
         |> required "stage_name" string
         |> required "team_ids" teamIdsDecoder
@@ -168,7 +168,7 @@ drawSheetDecoder : Decoder DrawSheet
 drawSheetDecoder =
     Decode.succeed DrawSheet
         |> required "sheet" int
-        |> required "game_id" (nullable int)
+        |> required "game_id" (nullable string)
         |> optional "value" string ""
         |> hardcoded False
         |> hardcoded True
@@ -195,7 +195,7 @@ encodeDrawSheet : DrawSheet -> Encode.Value
 encodeDrawSheet drawSheet =
     Encode.object
         [ ( "sheet", Encode.int drawSheet.sheet )
-        , ( "game_id", maybe Encode.int drawSheet.gameId )
+        , ( "game_id", maybe Encode.string drawSheet.gameId )
         ]
 
 
