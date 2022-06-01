@@ -7,11 +7,15 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
-  <div class="container">
+  <div class="px-2">
     <div id="draw-schedule"></div>
   </div>
   <script>
-    Elm.DrawSchedule.init({ node: document.getElementById("draw-schedule"), flags: { url: "http://localhost:3000/schedule" } })
+    Elm.DrawSchedule.init({
+      node: document.getElementById("draw-schedule"),
+      flags: { url: "http://localhost:3000/schedule" }
+      // flags: { url: "http://demo.curling.test:3000/en/admin/events/3742-monday-night-mens/draw_schedule" }
+    })
   </script>
 </body>
 </html>

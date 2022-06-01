@@ -64,7 +64,7 @@ type alias Game =
     { id : String
     , name : String
     , stageName : String
-    , teamIds : ( Int, Int )
+    , teamIds : ( Maybe Int, Maybe Int )
     , disabled : Bool
     }
 
@@ -143,9 +143,9 @@ gameDecoder =
         |> hardcoded False
 
 
-teamIdsDecoder : Decoder ( Int, Int )
+teamIdsDecoder : Decoder ( Maybe Int, Maybe Int )
 teamIdsDecoder =
-    map2 Tuple.pair (index 0 int) (index 1 int)
+    map2 Tuple.pair (Decode.maybe (index 0 int)) (Decode.maybe (index 1 int))
 
 
 savedDrawsDecoder : Decoder SavedDraws

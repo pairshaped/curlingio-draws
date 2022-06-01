@@ -167,7 +167,7 @@ teamsAlreadyAssignedInDraw onGame draw games =
         otherDrawGames =
             List.filter (\g -> gameInDraw g) games
 
-        teamsInDraw : List Int
+        teamsInDraw : List (Maybe Int)
         teamsInDraw =
             let
                 topTeams =
