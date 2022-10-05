@@ -167,19 +167,32 @@ teamsAlreadyAssignedInDraw onGame draw games =
         otherDrawGames =
             List.filter (\g -> gameInDraw g) games
 
-        teamsInDraw : List (Maybe Int)
+        teamsInDraw : List Int
         teamsInDraw =
             let
                 topTeams =
                     List.map (\g -> Tuple.first g.teamIds) otherDrawGames
+                        |> List.filterMap identity
 
                 bottomTeams =
                     List.map (\g -> Tuple.second g.teamIds) otherDrawGames
+                        |> List.filterMap identity
             in
             List.append topTeams bottomTeams
     in
-    List.member (Tuple.first onGame.teamIds) teamsInDraw
-        || List.member (Tuple.second onGame.teamIds) teamsInDraw
+    case onGame.teamIds of
+        ( Just x, Just y ) ->
+            List.member x teamsInDraw
+                || List.member y teamsInDraw
+
+        ( Just x, Nothing ) ->
+            List.member x teamsInDraw
+
+        ( Nothing, Just y ) ->
+            List.member y teamsInDraw
+
+        ( Nothing, Nothing ) ->
+            False
 
 
 validForSave : Model -> Bool

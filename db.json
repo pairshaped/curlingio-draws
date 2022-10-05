@@ -297,6 +297,18 @@
           7,
           3
         ]
+      },
+      {
+        "id": "29",
+        "name": "1",
+        "stage_name": "Playoffs",
+        "team_ids": []
+      },
+      {
+        "id": "30",
+        "name": "2",
+        "stage_name": "Playoffs",
+        "team_ids": []
       }
     ],
     "draws": [
