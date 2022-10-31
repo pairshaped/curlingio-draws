@@ -142,7 +142,7 @@ update msg model =
         ReselectGame index onDrawSheet ->
             let
                 updatedDrawSheet draw drawSheet =
-                    if drawSheet.sheet == onDrawSheet.sheet && drawSheet.value == "" && model.changed == False then
+                    if drawSheet.sheet == onDrawSheet.sheet && model.changed == False then
                         { drawSheet | value = Maybe.withDefault "" model.deselectedGame, gameId = Nothing, changed = False }
 
                     else
@@ -171,7 +171,7 @@ update msg model =
             let
                 updatedDrawSheet draw drawSheet =
                     if drawSheet.sheet == onDrawSheet.sheet then
-                        { drawSheet | value = value, gameId = Nothing, changed = True }
+                        { drawSheet | value = String.trim value, gameId = Nothing, changed = True }
 
                     else
                         drawSheet
