@@ -52,16 +52,18 @@ viewNotReady message =
 
 viewSchedule : Model -> Schedule -> Html Msg
 viewSchedule model schedule =
+    let
+        viewGameOption game =
+            option [ disabled game.disabled, value (gameName game) ] []
+    in
     div [ class "mt-3" ]
-        [ datalist [ id "games" ] (List.map (viewGameOption schedule.teams) schedule.games)
+        [ datalist [ id "games" ]
+            ([ option [ value " " ] [] ]
+                ++ List.map viewGameOption schedule.games
+            )
         , viewDrawsContainer model schedule
         , viewFooter model
         ]
-
-
-viewGameOption : List Team -> Game -> Html Msg
-viewGameOption teams game =
-    option [ disabled game.disabled, value (gameName game) ] []
 
 
 viewDrawsContainer : Model -> Schedule -> Html Msg

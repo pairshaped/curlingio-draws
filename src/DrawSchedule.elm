@@ -115,7 +115,7 @@ update msg model =
             let
                 updatedDrawSheet draw drawSheet =
                     if drawSheet.sheet == onDrawSheet.sheet then
-                        { drawSheet | value = "", gameId = Nothing, changed = False }
+                        { drawSheet | value = "", gameId = Nothing }
 
                     else
                         drawSheet
@@ -135,15 +135,15 @@ update msg model =
                         _ ->
                             model.schedule
             in
-            ( { model | schedule = updatedSchedule, deselectedGame = Just onDrawSheet.value, changed = False }
+            ( { model | schedule = updatedSchedule, deselectedGame = Just onDrawSheet.value }
             , Cmd.none
             )
 
         ReselectGame index onDrawSheet ->
             let
                 updatedDrawSheet draw drawSheet =
-                    if drawSheet.sheet == onDrawSheet.sheet && model.changed == False then
-                        { drawSheet | value = Maybe.withDefault "" model.deselectedGame, gameId = Nothing, changed = False }
+                    if drawSheet.sheet == onDrawSheet.sheet && onDrawSheet.changed == False then
+                        { drawSheet | value = Maybe.withDefault "" model.deselectedGame, gameId = Nothing }
 
                     else
                         drawSheet
@@ -163,7 +163,7 @@ update msg model =
                         _ ->
                             model.schedule
             in
-            ( { model | schedule = updatedSchedule, deselectedGame = Nothing, changed = False, validated = True }
+            ( { model | schedule = updatedSchedule, deselectedGame = Nothing }
             , Cmd.none
             )
 
