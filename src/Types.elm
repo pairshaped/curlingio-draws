@@ -14,6 +14,8 @@ type Msg
     | UpdateDrawLabel Int String
     | UpdateDrawStartsAt Int String
     | UpdateDrawAttendance Int String
+    | DeselectGame Int DrawSheet
+    | ReselectGame Int DrawSheet
     | SelectedGame Int DrawSheet String
     | AddDraw
     | DeleteDraw Int
@@ -26,6 +28,7 @@ type alias Model =
     , changed : Bool
     , validated : Bool
     , savedDraws : WebData SavedDraws
+    , deselectedGame : Maybe String
     }
 
 

@@ -19,7 +19,7 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( Model flags NotAsked False True NotAsked, getSchedule flags.url )
+    ( Model flags NotAsked False True NotAsked Nothing, getSchedule flags.url )
 
 
 
@@ -110,6 +110,62 @@ update msg model =
                             model.schedule
             in
             ( { model | schedule = updatedSchedule, changed = True, validated = False }, Cmd.none )
+
+        DeselectGame index onDrawSheet ->
+            let
+                updatedDrawSheet draw drawSheet =
+                    if drawSheet.sheet == onDrawSheet.sheet then
+                        { drawSheet | value = "", gameId = Nothing, changed = False }
+
+                    else
+                        drawSheet
+
+                updatedDraw schedule draw =
+                    { draw | drawSheets = List.map (updatedDrawSheet draw) draw.drawSheets }
+                        |> validateDrawSheets schedule
+
+                updatedDraws schedule =
+                    List.Extra.updateAt index (\draw -> updatedDraw schedule draw) schedule.draws
+
+                updatedSchedule =
+                    case model.schedule of
+                        Success decodedSchedule ->
+                            Success { decodedSchedule | draws = updatedDraws decodedSchedule }
+
+                        _ ->
+                            model.schedule
+            in
+            ( { model | schedule = updatedSchedule, deselectedGame = Just onDrawSheet.value, changed = False }
+            , Cmd.none
+            )
+
+        ReselectGame index onDrawSheet ->
+            let
+                updatedDrawSheet draw drawSheet =
+                    if drawSheet.sheet == onDrawSheet.sheet && drawSheet.value == "" && model.changed == False then
+                        { drawSheet | value = Maybe.withDefault "" model.deselectedGame, gameId = Nothing, changed = False }
+
+                    else
+                        drawSheet
+
+                updatedDraw schedule draw =
+                    { draw | drawSheets = List.map (updatedDrawSheet draw) draw.drawSheets }
+                        |> validateDrawSheets schedule
+
+                updatedDraws schedule =
+                    List.Extra.updateAt index (\draw -> updatedDraw schedule draw) schedule.draws
+
+                updatedSchedule =
+                    case model.schedule of
+                        Success decodedSchedule ->
+                            Success { decodedSchedule | draws = updatedDraws decodedSchedule }
+
+                        _ ->
+                            model.schedule
+            in
+            ( { model | schedule = updatedSchedule, deselectedGame = Nothing, changed = False, validated = True }
+            , Cmd.none
+            )
 
         SelectedGame index onDrawSheet value ->
             let

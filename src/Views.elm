@@ -3,7 +3,7 @@ module Views exposing (view)
 import Helpers exposing (..)
 import Html exposing (Html, button, datalist, div, em, input, option, p, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, disabled, id, list, min, name, required, style, type_, value)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onBlur, onClick, onFocus, onInput)
 import Http
 import RemoteData exposing (RemoteData(..))
 import Types exposing (..)
@@ -211,6 +211,8 @@ viewDrawSheet index drawSheet =
                        )
                 )
             , list "games"
+            , onFocus (DeselectGame index drawSheet)
+            , onBlur (ReselectGame index drawSheet)
             , onInput (SelectedGame index drawSheet)
             , value drawSheet.value
             ]
