@@ -1,29 +1,436 @@
 module DrawSchedule exposing (..)
 
 import Browser
-import Helpers exposing (..)
+import Html exposing (Html, button, datalist, div, em, input, option, p, table, tbody, td, text, th, thead, tr)
+import Html.Attributes exposing (class, disabled, id, min, name, style, type_, value)
+import Html.Events exposing (onBlur, onClick, onFocus, onInput)
+import Http
+import Json.Decode as Decode exposing (Decoder, bool, index, int, list, map2, nullable, string)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Encode as Encode
+import Json.Encode.Extra exposing (maybe)
 import List.Extra
-import RemoteData exposing (RemoteData(..))
-import Types exposing (..)
-import Views exposing (view)
+import RemoteData exposing (RemoteData(..), WebData)
+import RemoteData.Http
 
 
-main =
-    Browser.element
-        { init = init
-        , update = update
-        , subscriptions = subscriptions
-        , view = view
-        }
+
+-- MODEL
+
+
+type alias Model =
+    { flags : Flags
+    , schedule : WebData Schedule
+    , changed : Bool
+    , validated : Bool
+    , savedDraws : WebData SavedDraws
+    , selectableGames : List Game
+    , deselectedGame : Maybe String
+    }
+
+
+type alias Flags =
+    { url : String
+    }
+
+
+type alias Schedule =
+    { settings : Settings
+    , sheets : List String
+    , teams : List Team
+    , games : List Game
+    , draws : List Draw
+    }
+
+
+type alias SavedDraws =
+    { draws : List Draw }
+
+
+type alias Settings =
+    { hasAttendance : Bool
+    , minDateTime : String
+    , maxDateTime : String
+    }
+
+
+type alias Team =
+    { id : Int
+    , name : String
+    }
+
+
+type alias Game =
+    { id : String
+    , name : String
+    , stageName : String
+    , teamIds : ( Maybe Int, Maybe Int )
+    }
+
+
+type alias DrawLabel =
+    { value : String
+    , changed : Bool
+    , valid : Bool
+    }
+
+
+type alias DrawStartsAt =
+    { value : String
+    , changed : Bool
+    , valid : Bool
+    }
+
+
+type alias DrawAttendance =
+    { value : Maybe Int
+    , changed : Bool
+    , valid : Bool
+    }
+
+
+type alias Draw =
+    { id : Maybe Int
+    , label : DrawLabel
+    , startsAt : DrawStartsAt
+    , attendance : DrawAttendance
+    , drawSheets : List DrawSheet
+    }
+
+
+type alias DrawSheet =
+    { sheet : Int
+    , gameId : Maybe String
+    , value : String
+    , changed : Bool
+    , valid : Bool
+    }
+
+
+
+-- DECODERS
+
+
+decodeSchedule : Decoder Schedule
+decodeSchedule =
+    Decode.succeed Schedule
+        |> required "settings" decodeSettings
+        |> required "sheets" (list string)
+        |> required "teams" (list decodeTeam)
+        |> required "games" (list decodeGame)
+        |> required "draws" (list decodeDraw)
+
+
+decodeSettings : Decoder Settings
+decodeSettings =
+    Decode.succeed Settings
+        |> optional "has_attendance" bool False
+        |> required "min_datetime" string
+        |> required "max_datetime" string
+
+
+decodeTeam : Decoder Team
+decodeTeam =
+    Decode.succeed Team
+        |> required "id" int
+        |> required "name" string
+
+
+decodeGame : Decoder Game
+decodeGame =
+    Decode.succeed Game
+        |> required "id" string
+        |> required "name" string
+        |> required "stage_name" string
+        |> required "team_ids" decodeTeamIds
+
+
+decodeTeamIds : Decoder ( Maybe Int, Maybe Int )
+decodeTeamIds =
+    map2 Tuple.pair (Decode.maybe (index 0 int)) (Decode.maybe (index 1 int))
+
+
+decodeSavedDraws : Decoder SavedDraws
+decodeSavedDraws =
+    Decode.succeed SavedDraws
+        |> required "draws" (list decodeDraw)
+
+
+decodeDraw : Decoder Draw
+decodeDraw =
+    Decode.succeed Draw
+        |> required "id" (nullable int)
+        |> required "label" (string |> Decode.map (\val -> DrawLabel val False True))
+        |> required "starts_at" (string |> Decode.map (\val -> DrawStartsAt val False True))
+        |> required "attendance" (nullable int |> Decode.map (\val -> DrawAttendance val False True))
+        |> required "draw_sheets" (list decodeDrawSheet)
+
+
+decodeDrawSheet : Decoder DrawSheet
+decodeDrawSheet =
+    Decode.succeed DrawSheet
+        |> required "sheet" int
+        |> required "game_id" (nullable string)
+        |> optional "value" string ""
+        |> hardcoded False
+        |> hardcoded True
+
+
+
+-- ENCODERS
+
+
+encodeDraws : List Draw -> Encode.Value
+encodeDraws draws =
+    Encode.object
+        [ ( "draws", Encode.list encodeDraw draws ) ]
+
+
+encodeDraw : Draw -> Encode.Value
+encodeDraw draw =
+    Encode.object
+        [ ( "id", maybe Encode.int draw.id )
+        , ( "label", Encode.string draw.label.value )
+        , ( "starts_at", Encode.string draw.startsAt.value )
+        , ( "attendance", maybe Encode.int draw.attendance.value )
+        , ( "draw_sheets", Encode.list encodeDrawSheet draw.drawSheets )
+        ]
+
+
+encodeDrawSheet : DrawSheet -> Encode.Value
+encodeDrawSheet drawSheet =
+    Encode.object
+        [ ( "sheet", Encode.int drawSheet.sheet )
+        , ( "game_id", maybe Encode.string drawSheet.gameId )
+        ]
+
+
+encodeMaybe : (a -> Encode.Value) -> Maybe a -> Encode.Value
+encodeMaybe encoder maybe =
+    case maybe of
+        Just value ->
+            encoder value
+
+        Nothing ->
+            Encode.null
+
+
+
+-- HELPERS
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( Model flags NotAsked False True NotAsked Nothing, getSchedule flags.url )
+    ( Model flags NotAsked False True NotAsked [] Nothing, getSchedule flags.url )
+
+
+populateDrawSheetValues : Model -> Model
+populateDrawSheetValues model =
+    let
+        gameNameById id games =
+            case List.Extra.find (\game -> game.id == id) games of
+                Just game ->
+                    gameName game
+
+                Nothing ->
+                    ""
+
+        updatedDrawSheet schedule drawSheet =
+            { drawSheet
+                | value =
+                    case drawSheet.gameId of
+                        Just gameId ->
+                            gameNameById gameId schedule.games
+
+                        Nothing ->
+                            ""
+            }
+
+        updatedDraw schedule draw =
+            { draw | drawSheets = List.map (updatedDrawSheet schedule) draw.drawSheets }
+
+        updatedDraws schedule =
+            List.map (updatedDraw schedule) schedule.draws
+
+        updatedSchedule =
+            case model.schedule of
+                Success decodedSchedule ->
+                    Success { decodedSchedule | draws = updatedDraws decodedSchedule }
+
+                _ ->
+                    model.schedule
+    in
+    { model | schedule = updatedSchedule }
+
+
+updateSelectableGames : Int -> WebData Schedule -> List Game
+updateSelectableGames drawIndex schedule =
+    let
+        teamIdsInDraw : List Game -> Draw -> List Int
+        teamIdsInDraw games draw =
+            let
+                drawGameIds =
+                    List.map (\ds -> ds.gameId) draw.drawSheets
+                        |> List.filterMap identity
+            in
+            games
+                |> List.filter (\g -> List.member g.id drawGameIds)
+                |> List.map (\g -> [ Tuple.first g.teamIds, Tuple.second g.teamIds ])
+                |> List.foldr (++) []
+                |> List.filterMap identity
+
+        scheduledGameIds : List Draw -> List String
+        scheduledGameIds draws =
+            List.map (\d -> d.drawSheets) draws
+                |> List.foldr (++) []
+                |> List.map (\ds -> ds.gameId)
+                |> List.filterMap identity
+
+        unscheduledGames : List Game -> List Draw -> List Game
+        unscheduledGames games draws =
+            let
+                notScheduled game =
+                    not (List.member game.id (scheduledGameIds draws))
+            in
+            List.filter notScheduled games
+
+        availableGamesForDraw : List Game -> List Draw -> Draw -> List Game
+        availableGamesForDraw games draws draw =
+            -- Exclude games with a team that has already been selected in the draw.
+            let
+                -- exclude all games that have a team id that's in the draws team ids.
+                gameHasNoTeamsInDraw game =
+                    teamIdsInDraw games draw
+                        |> List.any (\id -> (Tuple.first game.teamIds == Just id) || (Tuple.second game.teamIds == Just id))
+                        |> not
+            in
+            unscheduledGames games draws
+                |> List.filter gameHasNoTeamsInDraw
+    in
+    case schedule of
+        Success schedule_ ->
+            case List.Extra.getAt drawIndex schedule_.draws of
+                Just draw ->
+                    availableGamesForDraw schedule_.games schedule_.draws draw
+
+                Nothing ->
+                    []
+
+        _ ->
+            []
+
+
+getSchedule : String -> Cmd Msg
+getSchedule url =
+    RemoteData.Http.get url GotSchedule decodeSchedule
+
+
+patchDraws : String -> List Draw -> Cmd Msg
+patchDraws url draws =
+    RemoteData.Http.patch url PatchedDraws decodeSavedDraws (encodeDraws draws)
+
+
+drawLabelIsValid : List Draw -> String -> Bool
+drawLabelIsValid draws value =
+    not
+        (value
+            == ""
+            || List.any (\draw -> draw.label.value == value) draws
+        )
+
+
+drawStartsAtIsValid : List Draw -> String -> Bool
+drawStartsAtIsValid draws value =
+    not
+        (value
+            == ""
+            || List.any (\draw -> draw.startsAt.value == value) draws
+        )
+
+
+drawAttendanceIsValid : String -> Bool
+drawAttendanceIsValid value =
+    (value == "")
+        || (case String.toInt value of
+                Just int ->
+                    int < 100000 && int >= 0
+
+                Nothing ->
+                    False
+           )
+
+
+gameName : Game -> String
+gameName game =
+    game.name ++ " - " ++ game.stageName
+
+
+findGameByName : List Game -> String -> Maybe Game
+findGameByName games name =
+    List.Extra.find (\game -> gameName game == name) games
+
+
+validateDrawSheets : Schedule -> Draw -> Draw
+validateDrawSheets schedule draw =
+    let
+        validateDrawSheet drawSheet =
+            case findGameByName schedule.games drawSheet.value of
+                Just game ->
+                    { drawSheet | gameId = Just game.id, valid = True }
+
+                Nothing ->
+                    if drawSheet.value == "" then
+                        { drawSheet | gameId = Nothing, valid = True }
+
+                    else
+                        { drawSheet | gameId = Nothing, valid = False }
+
+        validatedDrawSheets =
+            List.map validateDrawSheet draw.drawSheets
+    in
+    { draw | drawSheets = validatedDrawSheets }
+
+
+validForSave : Model -> Bool
+validForSave model =
+    let
+        drawSheetValid drawSheet =
+            drawSheet.valid
+
+        drawValid draw =
+            List.all drawSheetValid draw.drawSheets
+                && draw.label.valid
+                && draw.startsAt.valid
+                && draw.attendance.valid
+
+        drawsValid schedule =
+            List.all drawValid schedule.draws
+    in
+    case model.schedule of
+        Success decodedSchedule ->
+            drawsValid decodedSchedule
+
+        _ ->
+            False
 
 
 
 -- UPDATE
+
+
+type Msg
+    = GotSchedule (WebData Schedule)
+    | PatchedDraws (WebData SavedDraws)
+    | DiscardChanges
+    | UpdateDrawLabel Int String
+    | UpdateDrawStartsAt Int String
+    | UpdateDrawAttendance Int String
+    | DeselectGame Int DrawSheet
+    | ReselectGame Int DrawSheet
+    | SelectedGame Int DrawSheet String
+    | AddDraw
+    | DeleteDraw Int
+    | Save
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -32,7 +439,6 @@ update msg model =
         GotSchedule schedule ->
             ( { model | schedule = schedule }
                 |> populateDrawSheetValues
-                |> updateGames
             , Cmd.none
             )
 
@@ -115,14 +521,13 @@ update msg model =
             let
                 updatedDrawSheet draw drawSheet =
                     if drawSheet.sheet == onDrawSheet.sheet then
-                        { drawSheet | value = "", gameId = Nothing }
+                        { drawSheet | value = "" }
 
                     else
                         drawSheet
 
                 updatedDraw schedule draw =
                     { draw | drawSheets = List.map (updatedDrawSheet draw) draw.drawSheets }
-                        |> validateDrawSheets schedule
 
                 updatedDraws schedule =
                     List.Extra.updateAt index (\draw -> updatedDraw schedule draw) schedule.draws
@@ -135,22 +540,36 @@ update msg model =
                         _ ->
                             model.schedule
             in
-            ( { model | schedule = updatedSchedule, deselectedGame = Just onDrawSheet.value }
+            -- We want to fire another focus event once our data has been updated, otherwise the user would need to double click. Potentially send a message to javascript to trigger it again.
+            ( { model | schedule = updatedSchedule, selectableGames = updateSelectableGames index updatedSchedule, deselectedGame = Just onDrawSheet.value }
             , Cmd.none
             )
 
         ReselectGame index onDrawSheet ->
             let
-                updatedDrawSheet draw drawSheet =
+                updatedDrawSheet schedule draw drawSheet =
                     if drawSheet.sheet == onDrawSheet.sheet && onDrawSheet.changed == False then
-                        { drawSheet | value = Maybe.withDefault "" model.deselectedGame, gameId = Nothing }
+                        case model.deselectedGame of
+                            Just deselectedGame ->
+                                { drawSheet
+                                    | value = deselectedGame
+                                    , gameId =
+                                        case findGameByName schedule.games deselectedGame of
+                                            Just game ->
+                                                Just game.id
+
+                                            Nothing ->
+                                                Nothing
+                                }
+
+                            Nothing ->
+                                drawSheet
 
                     else
                         drawSheet
 
                 updatedDraw schedule draw =
-                    { draw | drawSheets = List.map (updatedDrawSheet draw) draw.drawSheets }
-                        |> validateDrawSheets schedule
+                    { draw | drawSheets = List.map (updatedDrawSheet schedule draw) draw.drawSheets }
 
                 updatedDraws schedule =
                     List.Extra.updateAt index (\draw -> updatedDraw schedule draw) schedule.draws
@@ -163,21 +582,31 @@ update msg model =
                         _ ->
                             model.schedule
             in
-            ( { model | schedule = updatedSchedule, deselectedGame = Nothing }
+            ( { model | schedule = updatedSchedule, selectableGames = [], deselectedGame = Nothing }
             , Cmd.none
             )
 
         SelectedGame index onDrawSheet value ->
             let
-                updatedDrawSheet draw drawSheet =
+                updatedDrawSheet schedule draw drawSheet =
                     if drawSheet.sheet == onDrawSheet.sheet then
-                        { drawSheet | value = String.trim value, gameId = Nothing, changed = True }
+                        { drawSheet
+                            | value = String.trim value
+                            , gameId =
+                                case findGameByName schedule.games (String.trim value) of
+                                    Just game ->
+                                        Just game.id
+
+                                    Nothing ->
+                                        Nothing
+                            , changed = True
+                        }
 
                     else
                         drawSheet
 
                 updatedDraw schedule draw =
-                    { draw | drawSheets = List.map (updatedDrawSheet draw) draw.drawSheets }
+                    { draw | drawSheets = List.map (updatedDrawSheet schedule draw) draw.drawSheets }
                         |> validateDrawSheets schedule
 
                 updatedDraws schedule =
@@ -191,8 +620,7 @@ update msg model =
                         _ ->
                             model.schedule
             in
-            ( { model | schedule = updatedSchedule, changed = True, validated = False }
-                |> updateGames
+            ( { model | schedule = updatedSchedule, selectableGames = [], changed = True, validated = False }
             , Cmd.none
             )
 
@@ -268,3 +696,299 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
+
+
+
+-- VIEW
+
+
+view : Model -> Html Msg
+view model =
+    case model.schedule of
+        NotAsked ->
+            viewNotReady "Initializing..."
+
+        Loading ->
+            viewNotReady "Loading..."
+
+        Failure error ->
+            let
+                errorMessage =
+                    case error of
+                        Http.BadUrl string ->
+                            "Bad URL used to fetch schedule: " ++ string
+
+                        Http.Timeout ->
+                            "Network timeout when trying to fetch schedule."
+
+                        Http.NetworkError ->
+                            "Network error when trying to fetch schedule."
+
+                        Http.BadStatus int ->
+                            "Bad status response from server when trying to fetch schedule."
+
+                        Http.BadBody string ->
+                            "Bad body response from server when trying to fetch schedule: " ++ string
+            in
+            viewNotReady errorMessage
+
+        Success schedule ->
+            viewSchedule model schedule
+
+
+viewNotReady : String -> Html Msg
+viewNotReady message =
+    div
+        [ class "mt-3" ]
+        [ text message ]
+
+
+viewSchedule : Model -> Schedule -> Html Msg
+viewSchedule model schedule =
+    -- The games in the datalist depends on which draw we're trying to assign a game to.
+    -- if we aren't trying to assign a game, then it can be empty.
+    let
+        viewGameOption game =
+            option [ value (gameName game) ] []
+    in
+    div [ class "mt-3" ]
+        [ datalist [ id "games" ]
+            ([ option [ value " " ] [] ]
+                ++ List.map viewGameOption model.selectableGames
+            )
+        , viewDrawsContainer model schedule
+        , viewFooter model
+        ]
+
+
+viewDrawsContainer : Model -> Schedule -> Html Msg
+viewDrawsContainer model schedule =
+    div
+        [ class "table-responsive" ]
+        [ table
+            [ class "table table-sm table-borderless table-striped"
+            , style "table-layout" "fixed"
+            ]
+            [ viewSheets schedule
+            , viewDraws model schedule
+            ]
+        ]
+
+
+viewSheets : Schedule -> Html Msg
+viewSheets schedule =
+    let
+        labelHeader list =
+            th [ style "width" "70px" ] [ text "Label" ] :: list
+
+        startsAtHeader list =
+            th [ style "width" "265px" ] [ text "Starts at" ] :: list
+
+        sheetHeader sheet =
+            th [ style "width" "150px" ] [ text sheet ]
+
+        attendanceHeader list =
+            if schedule.settings.hasAttendance then
+                list ++ [ th [ style "width" "80px" ] [ text "Attend" ] ]
+
+            else
+                list
+
+        deleteHeader list =
+            list ++ [ th [ style "width" "35px" ] [ text "" ] ]
+    in
+    thead []
+        [ tr []
+            (List.map sheetHeader schedule.sheets
+                |> startsAtHeader
+                |> labelHeader
+                |> attendanceHeader
+                |> deleteHeader
+            )
+        ]
+
+
+viewDraws : Model -> Schedule -> Html Msg
+viewDraws model schedule =
+    tbody []
+        (List.indexedMap (viewDraw model schedule.settings) schedule.draws)
+
+
+viewDraw : Model -> Settings -> Int -> Draw -> Html Msg
+viewDraw model settings index draw =
+    let
+        addAttendance drawSheetViews =
+            if settings.hasAttendance then
+                drawSheetViews ++ [ viewAttendance index draw ]
+
+            else
+                drawSheetViews
+
+        addDelete drawSheetViews =
+            drawSheetViews ++ [ viewDelete model index ]
+    in
+    tr []
+        (List.map (viewDrawSheet index)
+            draw.drawSheets
+            |> (::) (viewStartsAt settings index draw)
+            |> (::) (viewDrawLabel index draw)
+            |> addAttendance
+            |> addDelete
+        )
+
+
+viewDrawLabel : Int -> Draw -> Html Msg
+viewDrawLabel index draw =
+    td []
+        [ input
+            [ class "form-control"
+            , style "border"
+                ("1px solid "
+                    ++ (if not draw.label.valid then
+                            "#ff0000"
+
+                        else if draw.label.changed then
+                            "#ffc107"
+
+                        else
+                            "#ced4da"
+                       )
+                )
+            , Html.Attributes.required True
+            , onInput (UpdateDrawLabel index)
+            , value draw.label.value
+            ]
+            []
+        ]
+
+
+viewStartsAt : Settings -> Int -> Draw -> Html Msg
+viewStartsAt settings index draw =
+    td []
+        [ input
+            [ class "form-control"
+            , style "border"
+                ("1px solid "
+                    ++ (if not draw.startsAt.valid then
+                            "#ff0000"
+
+                        else if draw.startsAt.changed then
+                            "#ffc107"
+
+                        else
+                            "#ced4da"
+                       )
+                )
+            , onInput (UpdateDrawStartsAt index)
+            , type_ "datetime-local"
+            , Html.Attributes.min settings.minDateTime
+            , Html.Attributes.max settings.maxDateTime
+            , Html.Attributes.required True
+            , value draw.startsAt.value
+            ]
+            []
+        ]
+
+
+viewDrawSheet : Int -> DrawSheet -> Html Msg
+viewDrawSheet index drawSheet =
+    td []
+        [ input
+            [ class "form-control"
+            , style "border"
+                ("1px solid "
+                    ++ (if not drawSheet.valid then
+                            "#ff0000"
+
+                        else if drawSheet.changed then
+                            "#ffc107"
+
+                        else
+                            "#ced4da"
+                       )
+                )
+            , Html.Attributes.list "games"
+            , onFocus (DeselectGame index drawSheet)
+            , onBlur (ReselectGame index drawSheet)
+            , onInput (SelectedGame index drawSheet)
+            , value drawSheet.value
+            ]
+            []
+        ]
+
+
+viewAttendance : Int -> Draw -> Html Msg
+viewAttendance index draw =
+    td []
+        [ input
+            [ class "form-control"
+            , style "border"
+                ("1px solid "
+                    ++ (if not draw.attendance.valid then
+                            "#ff0000"
+
+                        else if draw.attendance.changed then
+                            "#ffc107"
+
+                        else
+                            "#ced4da"
+                       )
+                )
+            , type_ "number"
+            , Html.Attributes.required True
+            , Html.Attributes.min "0"
+            , Html.Attributes.max "99999"
+            , onInput (UpdateDrawAttendance index)
+            , value
+                (case draw.attendance.value of
+                    Just value ->
+                        String.fromInt value
+
+                    Nothing ->
+                        "0"
+                )
+            ]
+            []
+        ]
+
+
+viewDelete : Model -> Int -> Html Msg
+viewDelete model index =
+    td
+        [ class "text-right", style "padding-top" "7px" ]
+        [ button
+            [ class "btn btn-sm btn-secondary", style "min-width" "28px", disabled (model.savedDraws == Loading), onClick (DeleteDraw index) ]
+            [ text "X" ]
+        ]
+
+
+viewFooter : Model -> Html Msg
+viewFooter model =
+    div [ class "row mb-3" ]
+        [ div
+            [ class "col d-flex" ]
+            [ div
+                [ class "mr-1" ]
+                [ button [ class "btn btn-primary", style "min-width" "90px", disabled (model.savedDraws == Loading || not model.changed || not (validForSave model)), onClick Save ] [ text "Save" ]
+                ]
+            , div
+                [ class "mr-1" ]
+                [ button [ class "btn btn-secondary", style "min-width" "90px", disabled (model.savedDraws == Loading || not model.changed), onClick DiscardChanges ] [ text "Reset" ] ]
+            ]
+        , div
+            [ class "col text-right" ]
+            [ button [ class "btn btn-primary", style "min-width" "90px", disabled (model.savedDraws == Loading), onClick AddDraw ] [ text "Add Draw" ] ]
+        ]
+
+
+
+-- MAIN
+
+
+main =
+    Browser.element
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
