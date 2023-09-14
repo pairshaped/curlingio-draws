@@ -5,16 +5,37 @@
   <title>Draw Schedule Editor</title>
   <script src="dev.js"></script>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <style>
+    .draws__selectable-games {
+      position: absolute;
+      width: 200px;
+      max-height: 300px;
+      overflow-y: auto;
+      overflow-x: clip;
+      background: transparent;
+      border: solid 1px grey;
+      z-index: 200;
+    }
+    .draws__selectable-game {
+      width: 100%;
+      height: 32px;
+      background: white;
+      padding: 3px 6px;
+      border-bottom: "1px solid #ddd";
+      cursor: pointer;
+    }
+    .draws__selectable-game:hover {
+      background-color: #ddd;
+    }
+  </style>
 </head>
 <body>
-  <div class="px-2">
-    <div id="draw-schedule"></div>
-  </div>
+  <div id="draw-schedule"></div>
   <script>
     Elm.DrawSchedule.init({
       node: document.getElementById("draw-schedule"),
-      flags: { url: "http://localhost:3000/schedule" }
-      // flags: { url: "http://demo.curling.test:3000/en/admin/events/3742-monday-night-mens/draw_schedule" }
+      // flags: { url: "http://localhost:3000/schedule" }
+      flags: { url: "http://demo.curling.test:3000/en/admin/events/3742-monday-night-mens/draw_schedule" }
     })
   </script>
 </body>
