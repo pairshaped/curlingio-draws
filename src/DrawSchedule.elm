@@ -688,8 +688,7 @@ viewNotReady message =
 viewSchedule : Model -> Schedule -> Html Msg
 viewSchedule model schedule =
     div
-        [ class "container-fluid pt-3 pb-5"
-        , style "min-height" "100vh"
+        [ class "container-fluid pt-3 pb-3"
         , style "overflow" "auto"
         , onClick BlurredDrawSheet
         ]
