@@ -689,7 +689,6 @@ viewSchedule : Model -> Schedule -> Html Msg
 viewSchedule model schedule =
     div
         [ class "container-fluid pt-3 pb-3"
-        , style "overflow" "auto"
         , onClick BlurredDrawSheet
         ]
         [ viewDrawsContainer model schedule
@@ -699,12 +698,14 @@ viewSchedule model schedule =
 
 viewDrawsContainer : Model -> Schedule -> Html Msg
 viewDrawsContainer model schedule =
-    table
-        [ class "table table-sm table-borderless table-striped"
-        , style "table-layout" "fixed"
-        ]
-        [ viewSheets schedule
-        , viewDraws model schedule
+    div [ class "table-responsive mb-2" ]
+        [ table
+            [ class "table table-sm table-borderless table-striped"
+            , style "table-layout" "fixed"
+            ]
+            [ viewSheets schedule
+            , viewDraws model schedule
+            ]
         ]
 
 
