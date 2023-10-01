@@ -698,7 +698,16 @@ viewSchedule model schedule =
 
 viewDrawsContainer : Model -> Schedule -> Html Msg
 viewDrawsContainer model schedule =
-    div [ class "table-responsive mb-2" ]
+    div
+        [ class "table-responsive mb-2"
+        , style "padding-bottom"
+            (if model.selectedDrawSheet /= Nothing then
+                "220px"
+
+             else
+                "0px"
+            )
+        ]
         [ table
             [ class "table table-sm table-borderless table-striped"
             , style "table-layout" "fixed"
