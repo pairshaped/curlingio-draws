@@ -323,13 +323,46 @@ patchDraws url draws =
     RemoteData.Http.patch url PatchedDraws decodeSavedDraws (encodeDraws draws)
 
 
-drawLabelIsValid : List Draw -> String -> Bool
-drawLabelIsValid draws value =
-    not
-        (value
-            == ""
-            || List.any (\draw -> draw.label.value == value) draws
-        )
+validatedDraws : List Draw -> List Draw
+validatedDraws draws =
+    -- Called after we update label, startsAt, or attendance for a draw to flag any validation errors.
+    let
+        validatedDraw : Draw -> Draw
+        validatedDraw draw =
+            let
+                validatedLabel label =
+                    let
+                        dupeCount val =
+                            List.filter (\d -> d.label.value == val) draws
+                                |> List.length
+                    in
+                    { label | valid = label.value == "" || dupeCount label.value == 1 }
+
+                validatedStartsAt startsAt =
+                    let
+                        dupeCount val =
+                            List.filter (\d -> d.startsAt.value == val) draws
+                                |> List.length
+                    in
+                    { startsAt | valid = startsAt.value == "" || dupeCount startsAt.value == 1 }
+
+                validatedAttendance attendance =
+                    let
+                        isValid =
+                            (attendance.value == "")
+                                || (case String.toInt attendance.value of
+                                        Just int ->
+                                            int < 100000 && int >= 0
+
+                                        Nothing ->
+                                            False
+                                   )
+                    in
+                    { attendance | valid = isValid }
+            in
+            { draw | label = validatedLabel draw.label, startsAt = validatedStartsAt draw.startsAt }
+    in
+    List.map validatedDraw draws
 
 
 drawStartsAtIsValid : List Draw -> String -> Bool
@@ -339,18 +372,6 @@ drawStartsAtIsValid draws value =
             == ""
             || List.any (\draw -> draw.startsAt.value == value) draws
         )
-
-
-drawAttendanceIsValid : String -> Bool
-drawAttendanceIsValid value =
-    (value == "")
-        || (case String.toInt value of
-                Just int ->
-                    int < 100000 && int >= 0
-
-                Nothing ->
-                    False
-           )
 
 
 gameName : Game -> String
@@ -443,16 +464,17 @@ update msg model =
         DiscardChanges ->
             ( { model | schedule = Loading, changed = False, validated = True }, getSchedule model.flags.url )
 
-        UpdateDrawLabel drawIndex newLabel ->
+        UpdateDrawLabel drawIndex val ->
             let
                 updatedDrawLabel draws label =
-                    { label | value = newLabel, changed = True, valid = drawLabelIsValid draws newLabel }
+                    { label | value = val, changed = True }
 
                 updatedDraw draws draw =
                     { draw | label = updatedDrawLabel draws draw.label }
 
                 updatedDraws draws =
                     List.Extra.updateAt drawIndex (\draw -> updatedDraw draws draw) draws
+                        |> validatedDraws
 
                 updatedSchedule =
                     case model.schedule of
@@ -464,16 +486,17 @@ update msg model =
             in
             ( { model | schedule = updatedSchedule, changed = True, validated = False }, Cmd.none )
 
-        UpdateDrawStartsAt drawIndex newStartsAt ->
+        UpdateDrawStartsAt drawIndex val ->
             let
                 updatedDrawStartsAt draws startsAt =
-                    { startsAt | value = newStartsAt, changed = True, valid = drawStartsAtIsValid draws newStartsAt }
+                    { startsAt | value = val, changed = True }
 
                 updatedDraw draws draw =
                     { draw | startsAt = updatedDrawStartsAt draws draw.startsAt }
 
                 updatedDraws draws =
                     List.Extra.updateAt drawIndex (\draw -> updatedDraw draws draw) draws
+                        |> validatedDraws
 
                 updatedSchedule =
                     case model.schedule of
@@ -488,13 +511,14 @@ update msg model =
         UpdateDrawAttendance drawIndex newAttendance ->
             let
                 updatedDrawAttendance attendance =
-                    { attendance | value = String.toInt newAttendance, changed = True, valid = drawAttendanceIsValid newAttendance }
+                    { attendance | value = String.toInt newAttendance, changed = True }
 
                 updatedDraw draw =
                     { draw | attendance = updatedDrawAttendance draw.attendance }
 
                 updatedDraws draws =
                     List.Extra.updateAt drawIndex (\draw -> updatedDraw draw) draws
+                        |> validatedDraws
 
                 updatedSchedule =
                     case model.schedule of
