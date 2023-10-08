@@ -365,15 +365,6 @@ validatedDraws draws =
     List.map validatedDraw draws
 
 
-drawStartsAtIsValid : List Draw -> String -> Bool
-drawStartsAtIsValid draws value =
-    not
-        (value
-            == ""
-            || List.any (\draw -> draw.startsAt.value == value) draws
-        )
-
-
 gameName : Game -> String
 gameName game =
     game.name ++ " - " ++ game.stageName
