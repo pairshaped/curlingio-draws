@@ -718,9 +718,9 @@ viewSchedule model schedule =
                 , style "position" "fixed"
                 , style "top" "0"
                 , style "left" "0"
-                , style "z-index" "100"
+                , style "z-index" "200"
                 , style "overflow-y" "auto"
-                , style "backgroup-color" "#fff"
+                , style "background-color" "#fff"
                 , class "p-3"
                 ]
 
