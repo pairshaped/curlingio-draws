@@ -29,13 +29,16 @@
   </style>
 </head>
 <body>
-  <div id="draw-schedule"></div>
-  <script>
-    Elm.DrawSchedule.init({
-      node: document.getElementById("draw-schedule"),
-      // flags: { url: "http://localhost:3000/schedule" }
-      flags: { url: "http://demo.curling.test:3000/en/admin/events/3742-monday-night-mens/draw_schedule" }
-    })
-  </script>
+  <!-- This width restricted container is necessary to test full screen mode. -->
+  <div style="max-width: 1024px;">
+    <div id="draw-schedule"></div>
+    <script>
+      Elm.DrawSchedule.init({
+        node: document.getElementById("draw-schedule"),
+        // flags: { url: "http://localhost:3000/schedule" }
+        flags: { url: "http://demo.curling.test:3000/en/admin/events/3742-monday-night-mens/draw_schedule" }
+      })
+    </script>
+  </div>
 </body>
 </html>

@@ -21,6 +21,7 @@ import RemoteData.Http
 
 type alias Model =
     { flags : Flags
+    , fullScreen : Bool
     , schedule : WebData Schedule
     , changed : Bool
     , validated : Bool
@@ -227,7 +228,7 @@ encodeMaybe encoder maybe =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( Model flags NotAsked False True NotAsked Nothing, getSchedule flags.url )
+    ( Model flags False NotAsked False True NotAsked Nothing, getSchedule flags.url )
 
 
 populateDrawSheetValues : Model -> Model
@@ -424,7 +425,8 @@ validForSave model =
 
 
 type Msg
-    = GotSchedule (WebData Schedule)
+    = ToggleFullScreen
+    | GotSchedule (WebData Schedule)
     | PatchedDraws (WebData SavedDraws)
     | DiscardChanges
     | UpdateDrawLabel Int String
@@ -441,6 +443,9 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        ToggleFullScreen ->
+            ( { model | fullScreen = not model.fullScreen }, Cmd.none )
+
         GotSchedule schedule ->
             ( { model | schedule = schedule }
                 |> populateDrawSheetValues
@@ -703,10 +708,38 @@ viewNotReady message =
 viewSchedule : Model -> Schedule -> Html Msg
 viewSchedule model schedule =
     div
-        [ class "container-fluid pt-3 pb-3"
-        , onClick BlurredDrawSheet
-        ]
-        [ viewDrawsContainer model schedule
+        (List.append
+            [ id "schedule"
+            , onClick BlurredDrawSheet
+            ]
+            (if model.fullScreen then
+                [ style "width" "100%"
+                , style "height" "100%"
+                , style "position" "fixed"
+                , style "top" "0"
+                , style "left" "0"
+                , style "z-index" "100"
+                , style "overflow-y" "auto"
+                , style "backgroup-color" "#fff"
+                , class "p-3"
+                ]
+
+             else
+                [ class "container-fluid pt-3 pb-3" ]
+            )
+        )
+        [ div [ class "text-right" ]
+            [ button [ class "btn btn-sm btn-secondary", onClick ToggleFullScreen ]
+                [ text
+                    (if model.fullScreen then
+                        "Exit Full Screen"
+
+                     else
+                        "Full Screen"
+                    )
+                ]
+            ]
+        , viewDrawsContainer model schedule
         , viewFooter model
         ]
 
