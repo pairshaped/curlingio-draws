@@ -1,8 +1,6 @@
 {
   "scripts": {
-    "start": "nf start",
-    "client": "elm-live src/DrawSchedule.elm --start-page=dev.html --open -- --output=dev.js --debug",
-    "server": "json-server --watch db.json"
+    "start": "elm-live src/DrawSchedule.elm --start-page=dev.html --open -- --output=dev.js --debug"
   },
   "devDependencies": {
     "elm": "^0.19.1-5",
