@@ -38,6 +38,7 @@ type alias Flags =
 type alias Schedule =
     { settings : Settings
     , sheets : List String
+    , includedSheetNumbers : List Int
     , teams : List Team
     , games : List Game
     , draws : List Draw
@@ -123,6 +124,7 @@ decodeSchedule =
     Decode.succeed Schedule
         |> required "settings" decodeSettings
         |> required "sheets" (list string)
+        |> optional "included_sheet_numbers" (list int) [ 1, 2, 3, 4 ]
         |> required "teams" (list decodeTeam)
         |> required "games" (list decodeGame)
         |> required "draws" (list decodeDraw)
@@ -588,10 +590,10 @@ update msg model =
 
         AddDraw ->
             let
-                newDrawSheet index sheet =
-                    DrawSheet (index + 1) Nothing "" True True
+                newDrawSheet index sheetNumber =
+                    DrawSheet sheetNumber Nothing "" True True
 
-                updatedDraws sheets draws =
+                updatedDraws includedSheetNumbers draws =
                     let
                         nextLabel =
                             DrawLabel (String.fromInt (List.length draws + 1)) True True
@@ -611,12 +613,12 @@ update msg model =
                         nextAttendance =
                             DrawAttendance Nothing True True
                     in
-                    draws ++ [ Draw Nothing nextLabel nextStartsAt nextAttendance (List.indexedMap newDrawSheet sheets) ]
+                    draws ++ [ Draw Nothing nextLabel nextStartsAt nextAttendance (List.indexedMap newDrawSheet includedSheetNumbers) ]
 
                 updatedSchedule =
                     case model.schedule of
                         Success decodedSchedule ->
-                            Success { decodedSchedule | draws = updatedDraws decodedSchedule.sheets decodedSchedule.draws }
+                            Success { decodedSchedule | draws = updatedDraws decodedSchedule.includedSheetNumbers decodedSchedule.draws }
 
                         _ ->
                             model.schedule
