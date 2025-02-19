@@ -508,6 +508,14 @@ update msg model =
 
         UpdateDrawAttendance drawIndex newAttendance ->
             let
+                isValidAttendance =
+                    case String.toInt newAttendance of
+                        Just val ->
+                            val >= 0 && val <= 99999
+
+                        Nothing ->
+                            False
+
                 updatedDrawAttendance attendance =
                     { attendance | value = String.toInt newAttendance, changed = True }
 
@@ -530,7 +538,18 @@ update msg model =
                         _ ->
                             model.schedule
             in
-            ( { model | schedule = updatedSchedule, changed = True, validated = False }, Cmd.none )
+            ( { model
+                | schedule =
+                    if isValidAttendance then
+                        updatedSchedule
+
+                    else
+                        model.schedule
+                , changed = True
+                , validated = False
+              }
+            , Cmd.none
+            )
 
         FocusedDrawSheet selectedDrawSheet ->
             ( { model | selectedDrawSheet = Just selectedDrawSheet }
@@ -963,10 +982,7 @@ viewAttendance drawIndex draw =
                             "#ced4da"
                        )
                 )
-            , type_ "number"
             , Html.Attributes.required True
-            , Html.Attributes.min "0"
-            , Html.Attributes.max "99999"
             , onInput (UpdateDrawAttendance drawIndex)
             , value
                 (case draw.attendance.value of
