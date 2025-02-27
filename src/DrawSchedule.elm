@@ -272,8 +272,8 @@ populateDrawSheetValues model =
     { model | schedule = updatedSchedule }
 
 
-selectableGames : List Game -> List Draw -> Int -> List Game
-selectableGames games draws drawIndex =
+selectableGames : List Game -> List Draw -> Int -> DrawSheet -> List Game
+selectableGames games draws drawIndex drawSheet =
     let
         teamIdsInDraw =
             let
@@ -310,10 +310,20 @@ selectableGames games draws drawIndex =
             teamIdsInDraw
                 |> List.any (\id -> (Tuple.first game.teamIds == Just id) || (Tuple.second game.teamIds == Just id))
                 |> not
+
+        gameMatchesDrawSheetVal game =
+            case drawSheet.value of
+                "" ->
+                    True
+
+                _ ->
+                    String.contains (String.toLower drawSheet.value) (String.toLower game.name)
+                        || String.contains (String.toLower drawSheet.value) (String.toLower game.stageName)
     in
     -- Exclude games with a team that has already been selected in the draw.
     unscheduledGames
         |> List.filter gameHasNoTeamsInDraw
+        |> List.filter gameMatchesDrawSheetVal
 
 
 getSchedule : String -> Cmd Msg
@@ -435,6 +445,7 @@ type Msg
     | UpdateDrawStartsAt Int String
     | UpdateDrawAttendance Int String
     | FocusedDrawSheet SelectableDrawSheet
+    | UpdateDrawSheet SelectableDrawSheet String
     | BlurredDrawSheet
     | SelectedGame SelectableDrawSheet (Maybe Game)
     | AddDraw
@@ -555,6 +566,32 @@ update msg model =
             ( { model | selectedDrawSheet = Just selectedDrawSheet }
             , Cmd.none
             )
+
+        UpdateDrawSheet { drawIndex, drawSheet } val ->
+            let
+                updatedDrawSheet schedule draw onDrawSheet =
+                    if onDrawSheet.sheet == drawSheet.sheet then
+                        { onDrawSheet | value = val }
+
+                    else
+                        onDrawSheet
+
+                updatedDraw schedule draw =
+                    { draw | drawSheets = List.map (updatedDrawSheet schedule draw) draw.drawSheets }
+                        |> validateDrawSheets schedule
+
+                updatedDraws schedule =
+                    List.Extra.updateAt drawIndex (\draw -> updatedDraw schedule draw) schedule.draws
+
+                updatedSchedule =
+                    case model.schedule of
+                        Success decodedSchedule ->
+                            Success { decodedSchedule | draws = updatedDraws decodedSchedule }
+
+                        _ ->
+                            model.schedule
+            in
+            ( { model | schedule = updatedSchedule }, Cmd.none )
 
         BlurredDrawSheet ->
             ( { model | selectedDrawSheet = Nothing }
@@ -922,13 +959,14 @@ viewDrawSheet games draws selectedDrawSheet drawIndex drawSheet =
                 , Html.Attributes.list "games"
                 , onFocus (FocusedDrawSheet (SelectableDrawSheet drawIndex drawSheet))
                 , onClickPreventDefaultAndStopPropagation (FocusedDrawSheet (SelectableDrawSheet drawIndex drawSheet))
+                , onInput (UpdateDrawSheet (SelectableDrawSheet drawIndex drawSheet))
                 , value drawSheet.value
                 ]
                 []
             , case selectedDrawSheet of
                 Just selected ->
                     if selected.drawIndex == drawIndex && selected.drawSheet.sheet == drawSheet.sheet then
-                        viewSelectableGames (selectableGames games draws drawIndex) selected
+                        viewSelectableGames (selectableGames games draws drawIndex drawSheet) selected
 
                     else
                         text ""
