@@ -2,8 +2,8 @@
 
 set -e
 
-js="prod.js"
-min="prod.min.js"
+js="draw_schedule.js"
+min="draw_schedule.min.js"
 
 elm make src/DrawSchedule.elm --optimize --output=$js $@
 
@@ -12,3 +12,6 @@ uglifyjs $js --compress 'pure_funcs="F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A
 echo "Compiled size:$(cat $js | wc -c) bytes  ($js)"
 echo "Minified size:$(cat $min | wc -c) bytes  ($min)"
 echo "Gzipped size: $(cat $min | gzip -c | wc -c) bytes"
+
+cp -f $js ../v2/vendor/assets/javascripts/
+cp -f $min ../v2/vendor/assets/javascripts/

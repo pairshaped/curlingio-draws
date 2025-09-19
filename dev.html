@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Draw Schedule Editor</title>
   <script src="dev.js"></script>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="bootstrap.min.css" />
   <style>
     .draws__selectable-games {
       position: absolute;
@@ -35,7 +35,7 @@
     <script>
       Elm.DrawSchedule.init({
         node: document.getElementById("draw-schedule"),
-        flags: { url: "http://guelph.curling.test:3000/en/admin/events/19779/draw_schedule" }
+        flags: { url: "http://tunbridge.curling.test:3000/en/admin/events/23550-friday-night-social/draw_schedule" }
       })
     </script>
   </div>

@@ -786,7 +786,7 @@ viewSchedule model schedule =
                 [ class "container-fluid pt-3 pb-3" ]
             )
         )
-        [ div [ class "text-right" ]
+        [ div [ class "text-end" ]
             [ button [ class "btn btn-sm btn-secondary", onClick ToggleFullScreen ]
                 [ text
                     (if model.fullScreen then
@@ -1038,7 +1038,7 @@ viewAttendance drawIndex draw =
 viewDelete : Model -> Int -> Html Msg
 viewDelete model drawIndex =
     td
-        [ class "text-right", style "padding-top" "7px" ]
+        [ class "text-end", style "padding-top" "7px" ]
         [ button
             [ class "btn btn-sm btn-secondary", style "min-width" "28px", disabled (model.savedDraws == Loading), onClick (DeleteDraw drawIndex) ]
             [ text "X" ]
@@ -1051,15 +1051,15 @@ viewFooter model =
         [ div
             [ class "col d-flex" ]
             [ div
-                [ class "mr-1" ]
+                [ class "me-1" ]
                 [ button [ class "btn btn-primary", style "min-width" "90px", disabled (model.savedDraws == Loading || not model.changed || not (validForSave model)), onClick Save ] [ text "Save" ]
                 ]
             , div
-                [ class "mr-1" ]
+                [ class "me-1" ]
                 [ button [ class "btn btn-secondary", style "min-width" "90px", disabled (model.savedDraws == Loading || not model.changed), onClick DiscardChanges ] [ text "Reset" ] ]
             ]
         , div
-            [ class "col text-right" ]
+            [ class "col text-end" ]
             [ button [ class "btn btn-primary", style "min-width" "90px", disabled (model.savedDraws == Loading), onClick AddDraw ] [ text "Add Draw" ] ]
         ]
 
