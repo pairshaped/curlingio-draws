@@ -13,5 +13,4 @@ echo "Compiled size:$(cat $js | wc -c) bytes  ($js)"
 echo "Minified size:$(cat $min | wc -c) bytes  ($min)"
 echo "Gzipped size: $(cat $min | gzip -c | wc -c) bytes"
 
-cp -f $js ../v2/vendor/assets/javascripts/
 cp -f $min ../v2/vendor/assets/javascripts/
